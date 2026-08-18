@@ -1,0 +1,926 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>모음 연습 · Hangul Vowel Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #1c2333;
+        --ink-2: #252d42;
+        --paper: #eee7d8;
+        --paper-dim: #c9c0ac;
+        --jade: #4fa98c;
+        --jade-dim: #3a7d67;
+        --gold: #e3ac4d;
+        --coral: #e2584c;
+        --line: rgba(238, 231, 216, 0.14);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        min-height: 100vh;
+        background:
+          radial-gradient(
+            circle at 15% 10%,
+            rgba(79, 169, 140, 0.1),
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at 90% 85%,
+            rgba(227, 172, 77, 0.08),
+            transparent 40%
+          ),
+          var(--ink);
+        color: var(--paper);
+        font-family: "Space Grotesk", sans-serif;
+        display: flex;
+        justify-content: center;
+        padding: 32px 16px 60px;
+      }
+      .stage {
+        width: 100%;
+        max-width: 520px;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 22px;
+      }
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--jade);
+        margin-bottom: 6px;
+        font-weight: 500;
+      }
+      h1 {
+        font-family: "Noto Serif KR", serif;
+        font-weight: 900;
+        font-size: 28px;
+        margin: 0;
+        letter-spacing: 0.01em;
+      }
+      h1 span {
+        color: var(--gold);
+      }
+      .sub {
+        color: var(--paper-dim);
+        font-size: 13.5px;
+        margin-top: 6px;
+      }
+
+      /* ---- Category select screen ---- */
+      .set-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .set-card {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        background: linear-gradient(180deg, var(--ink-2), var(--ink));
+        border: 1.5px solid var(--line);
+        border-radius: 18px;
+        padding: 20px 20px;
+        cursor: pointer;
+        text-align: left;
+        transition:
+          border-color 0.15s,
+          transform 0.12s,
+          background 0.15s;
+      }
+      .set-card:hover {
+        border-color: var(--jade-dim);
+        transform: translateY(-2px);
+      }
+      .set-card:active {
+        transform: translateY(0px) scale(0.99);
+      }
+      .set-card .glyphs {
+        font-family: "Noto Serif KR", serif;
+        font-weight: 700;
+        font-size: 26px;
+        color: var(--gold);
+        min-width: 92px;
+        line-height: 1.15;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 6px;
+      }
+      .set-card .info {
+        flex: 1;
+      }
+      .set-card .tag {
+        font-size: 10.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--jade);
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .set-card h3 {
+        font-family: "Noto Serif KR", serif;
+        font-size: 19px;
+        margin: 0 0 4px;
+        font-weight: 700;
+      }
+      .set-card p {
+        margin: 0;
+        font-size: 12.5px;
+        color: var(--paper-dim);
+      }
+      .set-card .arrow {
+        font-size: 18px;
+        color: var(--paper-dim);
+        transition:
+          transform 0.15s,
+          color 0.15s;
+      }
+      .set-card:hover .arrow {
+        transform: translateX(4px);
+        color: var(--gold);
+      }
+
+      /* ---- Quiz screen ---- */
+      .stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 22px 0 14px;
+        font-size: 13px;
+        color: var(--paper-dim);
+      }
+      .stats b {
+        color: var(--paper);
+        font-weight: 700;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        max-width: 280px;
+        justify-content: flex-end;
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(238, 231, 216, 0.18);
+      }
+      .dot.done {
+        background: var(--jade);
+      }
+      .dot.miss {
+        background: var(--coral);
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: none;
+        border: none;
+        color: var(--paper-dim);
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 12.5px;
+        cursor: pointer;
+        padding: 0;
+        margin-bottom: 16px;
+        letter-spacing: 0.02em;
+        transition: color 0.12s;
+      }
+      .back-link:hover {
+        color: var(--paper);
+      }
+
+      .card {
+        position: relative;
+        background: linear-gradient(180deg, var(--ink-2), var(--ink));
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 46px 28px 34px;
+        text-align: center;
+        box-shadow: 0 24px 50px -20px rgba(0, 0, 0, 0.55);
+        overflow: hidden;
+      }
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, var(--jade) 0%, var(--jade) 0, transparent 0),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 38px,
+            rgba(238, 231, 216, 0.025) 38px,
+            rgba(238, 231, 216, 0.025) 39px
+          );
+        pointer-events: none;
+      }
+      .mode-tag {
+        display: inline-block;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--gold);
+        border: 1px solid rgba(227, 172, 77, 0.35);
+        border-radius: 999px;
+        padding: 4px 12px;
+        margin-bottom: 22px;
+        font-weight: 500;
+      }
+      .prompt {
+        font-family: "Noto Serif KR", serif;
+        font-weight: 900;
+        line-height: 1;
+        min-height: 104px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          transform 0.18s ease,
+          opacity 0.18s ease;
+      }
+      .prompt.hangul {
+        font-size: 98px;
+        color: var(--paper);
+      }
+      .prompt.latin {
+        font-size: 48px;
+        color: var(--paper);
+        letter-spacing: 0.02em;
+      }
+      .prompt.shake {
+        animation: shake 0.32s;
+      }
+      @keyframes shake {
+        20% {
+          transform: translateX(-8px);
+        }
+        40% {
+          transform: translateX(7px);
+        }
+        60% {
+          transform: translateX(-5px);
+        }
+        80% {
+          transform: translateX(4px);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
+
+      .feedback {
+        min-height: 22px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-top: 14px;
+      }
+      .feedback.correct {
+        color: var(--jade);
+      }
+      .feedback.wrong {
+        color: var(--coral);
+      }
+
+      .answer-row {
+        margin-top: 26px;
+      }
+      input.text-answer {
+        width: 100%;
+        background: rgba(238, 231, 216, 0.06);
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 20px;
+        color: var(--paper);
+        font-family: "Space Grotesk", sans-serif;
+        text-align: center;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      input.text-answer:focus {
+        border-color: var(--jade);
+      }
+      input.text-answer.wrong-flash {
+        border-color: var(--coral);
+      }
+      input.text-answer.correct-flash {
+        border-color: var(--jade);
+      }
+
+      .keyboard {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+      .key {
+        font-family: "Noto Serif KR", serif;
+        font-weight: 700;
+        font-size: 26px;
+        background: rgba(238, 231, 216, 0.05);
+        border: 1.5px solid var(--line);
+        color: var(--paper);
+        border-radius: 12px;
+        padding: 14px 0;
+        cursor: pointer;
+        transition:
+          background 0.12s,
+          border-color 0.12s,
+          transform 0.08s;
+      }
+      .key:hover {
+        background: rgba(79, 169, 140, 0.14);
+        border-color: var(--jade-dim);
+      }
+      .key:active {
+        transform: scale(0.94);
+      }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      button.action {
+        flex: 1;
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 13px 0;
+        border-radius: 12px;
+        border: 1.5px solid var(--line);
+        background: transparent;
+        color: var(--paper);
+        cursor: pointer;
+        letter-spacing: 0.02em;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+      button.action.primary {
+        background: var(--jade);
+        border-color: var(--jade);
+        color: #0e1a17;
+      }
+      button.action.primary:hover {
+        background: var(--jade-dim);
+        border-color: var(--jade-dim);
+      }
+      button.action.ghost:hover {
+        border-color: var(--paper-dim);
+      }
+
+      .hangul-answer {
+        width: 100%;
+        min-height: 64px;
+        background: rgba(238, 231, 216, 0.06);
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 16px;
+        margin-top: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-family: "Noto Serif KR", serif;
+        font-weight: 700;
+        font-size: 34px;
+        color: var(--paper);
+        transition: border-color 0.15s;
+      }
+      .hangul-answer.placeholder {
+        color: var(--paper-dim);
+        font-size: 14px;
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 500;
+      }
+      .hangul-answer.wrong-flash {
+        border-color: var(--coral);
+      }
+      .hangul-answer.correct-flash {
+        border-color: var(--jade);
+      }
+
+      .kb-utility {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .kb-utility button {
+        flex: 1;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--paper-dim);
+        background: transparent;
+        border: 1.5px solid var(--line);
+        border-radius: 10px;
+        padding: 9px 0;
+        cursor: pointer;
+        transition:
+          border-color 0.12s,
+          color 0.12s;
+      }
+      .kb-utility button:hover {
+        border-color: var(--paper-dim);
+        color: var(--paper);
+      }
+
+      .done-screen {
+        text-align: center;
+        padding: 20px 4px;
+      }
+      .done-screen .big {
+        font-family: "Noto Serif KR", serif;
+        font-weight: 900;
+        font-size: 44px;
+        color: var(--gold);
+      }
+      .done-screen p {
+        color: var(--paper-dim);
+        font-size: 14px;
+        margin-top: 6px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      @media (max-width: 400px) {
+        .prompt.hangul {
+          font-size: 74px;
+        }
+        .card {
+          padding: 36px 18px 26px;
+        }
+        .set-card .glyphs {
+          min-width: 78px;
+          font-size: 21px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <header>
+        <div class="eyebrow">모음 연습 · vowel drill</div>
+        <h1>Hangul <span>Vowel</span> Quiz</h1>
+        <div class="sub" id="headerSub">Choose a set to practice</div>
+      </header>
+
+      <div id="selectScreen">
+        <div class="set-cards" id="setCards"></div>
+      </div>
+
+      <div id="quizScreen" class="hidden">
+        <button class="back-link" id="backBtn">← back to sets</button>
+
+        <div class="stats">
+          <div>
+            Score <b id="scoreLabel">0</b> / <span id="totalLabel">0</span>
+          </div>
+          <div class="dots" id="dots"></div>
+        </div>
+
+        <div class="card" id="card">
+          <div class="mode-tag" id="modeTag">
+            Read the Hangul, type romanization
+          </div>
+          <div class="prompt hangul" id="prompt">ㅏ</div>
+          <div class="feedback" id="feedback"></div>
+
+          <div class="answer-row" id="textAnswerRow">
+            <input
+              class="text-answer"
+              id="textAnswer"
+              placeholder="type romanization…"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+            />
+          </div>
+
+          <div id="hangulAnswerWrap" class="hidden">
+            <div class="hangul-answer placeholder" id="hangulAnswer">
+              tap the letters below
+            </div>
+            <div class="keyboard" id="keyboardRow"></div>
+            <div class="kb-utility">
+              <button type="button" id="backspaceBtn">⌫ Backspace</button>
+              <button type="button" id="clearBtn">Clear</button>
+            </div>
+          </div>
+
+          <div class="controls">
+            <button class="action ghost" id="skipBtn">Skip</button>
+            <button class="action primary" id="checkBtn">Check</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const VOWEL_SETS = {
+        basic: {
+          label: "8 Basic Vowels",
+          tag: "Level 1",
+          desc: "ㅏ ㅓ ㅗ ㅜ ㅡ ㅣ ㅐ ㅔ — the foundation sounds",
+          glyphs: "ㅏㅓㅗㅜㅡㅣㅐㅔ",
+          vowels: [
+            { hangul: "ㅏ", latin: "a" },
+            { hangul: "ㅓ", latin: "eo" },
+            { hangul: "ㅗ", latin: "o" },
+            { hangul: "ㅜ", latin: "u" },
+            { hangul: "ㅡ", latin: "eu" },
+            { hangul: "ㅣ", latin: "i" },
+            { hangul: "ㅐ", latin: "ae" },
+            { hangul: "ㅔ", latin: "e" },
+          ],
+        },
+        y: {
+          label: "6 Y Sounds",
+          tag: "Level 2",
+          desc: 'ㅑ ㅕ ㅛ ㅠ ㅒ ㅖ — iotized "y-" vowels',
+          glyphs: "ㅑㅕㅛㅠㅒㅖ",
+          vowels: [
+            { hangul: "ㅑ", latin: "ya" },
+            { hangul: "ㅕ", latin: "yeo" },
+            { hangul: "ㅛ", latin: "yo" },
+            { hangul: "ㅠ", latin: "yu" },
+            { hangul: "ㅒ", latin: "yae" },
+            { hangul: "ㅖ", latin: "ye" },
+          ],
+        },
+        w: {
+          label: "7 W Sounds",
+          tag: "Level 3",
+          desc: 'ㅘ ㅝ ㅚ ㅙ ㅞ ㅟ ㅢ — glide "w-" vowels',
+          glyphs: "ㅘㅝㅚㅙㅞㅟㅢ",
+          vowels: [
+            { hangul: "ㅘ", latin: "wa" },
+            { hangul: "ㅝ", latin: "wo" },
+            { hangul: "ㅚ", latin: "oe" },
+            { hangul: "ㅙ", latin: "wae" },
+            { hangul: "ㅞ", latin: "we" },
+            { hangul: "ㅟ", latin: "wi" },
+            { hangul: "ㅢ", latin: "ui" },
+          ],
+        },
+      };
+
+      let activeSetKey = null;
+      let VOWELS = [];
+      let TOTAL_QUESTIONS = 0;
+
+      let queue = [];
+      let qIndex = 0;
+      let score = 0;
+      let results = [];
+      let current = null;
+      let answered = false;
+      let typedHangul = "";
+
+      const selectScreen = document.getElementById("selectScreen");
+      const quizScreen = document.getElementById("quizScreen");
+      const setCardsEl = document.getElementById("setCards");
+      const headerSub = document.getElementById("headerSub");
+      const backBtn = document.getElementById("backBtn");
+
+      let promptEl,
+        modeTagEl,
+        feedbackEl,
+        textRow,
+        textInput,
+        hangulAnswerWrap,
+        hangulAnswerEl,
+        keyboardRow,
+        checkBtn,
+        skipBtn,
+        backspaceBtn,
+        clearBtn;
+      const scoreLabel = document.getElementById("scoreLabel");
+      const totalLabel = document.getElementById("totalLabel");
+      const dotsEl = document.getElementById("dots");
+      const cardEl = document.getElementById("card");
+
+      function shuffle(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+      /* ---------- Selection screen ---------- */
+      function renderSetCards() {
+        setCardsEl.innerHTML = "";
+        Object.entries(VOWEL_SETS).forEach(([key, set]) => {
+          const c = document.createElement("div");
+          c.className = "set-card";
+          c.innerHTML = `
+      <div class="glyphs">${set.glyphs}</div>
+      <div class="info">
+        <div class="tag">${set.tag}</div>
+        <h3>${set.label}</h3>
+        <p>${set.desc}</p>
+      </div>
+      <div class="arrow">→</div>
+    `;
+          c.addEventListener("click", () => startSet(key));
+          setCardsEl.appendChild(c);
+        });
+      }
+
+      function showSelectScreen() {
+        activeSetKey = null;
+        headerSub.textContent = "Choose a set to practice";
+        selectScreen.classList.remove("hidden");
+        quizScreen.classList.add("hidden");
+      }
+
+      function startSet(key) {
+        activeSetKey = key;
+        VOWELS = VOWEL_SETS[key].vowels;
+        headerSub.textContent =
+          VOWEL_SETS[key].label + " — read it, type it, both ways";
+        selectScreen.classList.add("hidden");
+        quizScreen.classList.remove("hidden");
+        buildQuizShell();
+        bindCardRefs();
+        startRound();
+      }
+
+      backBtn.addEventListener("click", showSelectScreen);
+
+      /* ---------- Quiz shell (rebuilt fresh per set / restart) ---------- */
+      function buildQuizShell() {
+        cardEl.innerHTML = `
+    <div class="mode-tag" id="modeTag">Read the Hangul, type romanization</div>
+    <div class="prompt hangul" id="prompt">${VOWELS[0].hangul}</div>
+    <div class="feedback" id="feedback"></div>
+    <div class="answer-row" id="textAnswerRow">
+      <input class="text-answer" id="textAnswer" placeholder="type romanization…" autocomplete="off" autocapitalize="off" spellcheck="false">
+    </div>
+    <div id="hangulAnswerWrap" class="hidden">
+      <div class="hangul-answer placeholder" id="hangulAnswer">tap the letters below</div>
+      <div class="keyboard" id="keyboardRow"></div>
+      <div class="kb-utility">
+        <button type="button" id="backspaceBtn">⌫ Backspace</button>
+        <button type="button" id="clearBtn">Clear</button>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="action ghost" id="skipBtn">Skip</button>
+      <button class="action primary" id="checkBtn">Check</button>
+    </div>
+  `;
+      }
+
+      function bindCardRefs() {
+        promptEl = document.getElementById("prompt");
+        modeTagEl = document.getElementById("modeTag");
+        feedbackEl = document.getElementById("feedback");
+        textRow = document.getElementById("textAnswerRow");
+        textInput = document.getElementById("textAnswer");
+        hangulAnswerWrap = document.getElementById("hangulAnswerWrap");
+        hangulAnswerEl = document.getElementById("hangulAnswer");
+        keyboardRow = document.getElementById("keyboardRow");
+        checkBtn = document.getElementById("checkBtn");
+        skipBtn = document.getElementById("skipBtn");
+        backspaceBtn = document.getElementById("backspaceBtn");
+        clearBtn = document.getElementById("clearBtn");
+
+        checkBtn.addEventListener("click", () => submitAnswer());
+        skipBtn.addEventListener("click", () => {
+          if (answered) return;
+          markAnswer(false);
+        });
+        textInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") submitAnswer();
+        });
+        backspaceBtn.addEventListener("click", () => {
+          if (answered) return;
+          typedHangul = typedHangul.slice(0, -1);
+          renderHangulAnswer();
+        });
+        clearBtn.addEventListener("click", () => {
+          if (answered) return;
+          typedHangul = "";
+          renderHangulAnswer();
+        });
+      }
+
+      /* ---------- Round / queue logic ---------- */
+      function buildQueue() {
+        TOTAL_QUESTIONS = VOWELS.length * 2;
+        let pool = [];
+        while (pool.length < TOTAL_QUESTIONS) {
+          pool = pool.concat(shuffle(VOWELS));
+        }
+        pool = pool.slice(0, TOTAL_QUESTIONS);
+        queue = shuffle(
+          pool.map((v) => ({
+            vowel: v,
+            direction: Math.random() < 0.5 ? "toLatin" : "toHangul",
+          })),
+        );
+        results = new Array(TOTAL_QUESTIONS).fill("pending");
+        totalLabel.textContent = TOTAL_QUESTIONS;
+        renderDots();
+      }
+
+      function renderDots() {
+        dotsEl.innerHTML = "";
+        results.forEach((r) => {
+          const d = document.createElement("div");
+          d.className =
+            "dot" + (r === "done" ? " done" : r === "miss" ? " miss" : "");
+          dotsEl.appendChild(d);
+        });
+      }
+
+      function buildKeyboard() {
+        keyboardRow.innerHTML = "";
+        shuffle(VOWELS).forEach((v) => {
+          const b = document.createElement("button");
+          b.className = "key";
+          b.type = "button";
+          b.textContent = v.hangul;
+          b.addEventListener("click", () => {
+            if (answered) return;
+            typedHangul += v.hangul;
+            renderHangulAnswer();
+          });
+          keyboardRow.appendChild(b);
+        });
+      }
+
+      function renderHangulAnswer() {
+        if (typedHangul.length === 0) {
+          hangulAnswerEl.textContent = "tap the letters below";
+          hangulAnswerEl.classList.add("placeholder");
+        } else {
+          hangulAnswerEl.textContent = typedHangul;
+          hangulAnswerEl.classList.remove("placeholder");
+        }
+      }
+
+      function loadQuestion() {
+        if (qIndex >= queue.length) {
+          showDoneScreen();
+          return;
+        }
+        answered = false;
+        current = queue[qIndex];
+        feedbackEl.textContent = "";
+        feedbackEl.className = "feedback";
+        promptEl.classList.remove("shake");
+
+        if (current.direction === "toLatin") {
+          modeTagEl.textContent = "Read the Hangul, type romanization";
+          promptEl.className = "prompt hangul";
+          promptEl.textContent = current.vowel.hangul;
+          textRow.classList.remove("hidden");
+          hangulAnswerWrap.classList.add("hidden");
+          textInput.value = "";
+          textInput.classList.remove("wrong-flash", "correct-flash");
+          textInput.disabled = false;
+          setTimeout(() => textInput.focus(), 30);
+        } else {
+          modeTagEl.textContent = "Read the romanization, type the Hangul";
+          promptEl.className = "prompt latin";
+          promptEl.textContent = current.vowel.latin;
+          textRow.classList.add("hidden");
+          hangulAnswerWrap.classList.remove("hidden");
+          typedHangul = "";
+          renderHangulAnswer();
+          hangulAnswerEl.classList.remove("wrong-flash", "correct-flash");
+          buildKeyboard();
+          backspaceBtn.disabled = false;
+          clearBtn.disabled = false;
+        }
+        checkBtn.textContent = "Check";
+        checkBtn.style.display = "block";
+      }
+
+      function normalize(str) {
+        return str.trim().toLowerCase();
+      }
+
+      function submitAnswer() {
+        if (answered) return;
+        let correct;
+        if (current.direction === "toLatin") {
+          correct = normalize(textInput.value) === current.vowel.latin;
+        } else {
+          correct = typedHangul === current.vowel.hangul;
+        }
+        markAnswer(correct);
+      }
+
+      function markAnswer(correct) {
+        answered = true;
+        if (correct) {
+          score++;
+          results[qIndex] = "done";
+          feedbackEl.textContent = "맞았어요! Correct.";
+          feedbackEl.className = "feedback correct";
+          if (current.direction === "toLatin")
+            textInput.classList.add("correct-flash");
+          else hangulAnswerEl.classList.add("correct-flash");
+        } else {
+          results[qIndex] = "miss";
+          const correctAnswer =
+            current.direction === "toLatin"
+              ? current.vowel.latin
+              : current.vowel.hangul;
+          feedbackEl.textContent = `Not quite — it's "${correctAnswer}".`;
+          feedbackEl.className = "feedback wrong";
+          promptEl.classList.add("shake");
+          if (current.direction === "toLatin")
+            textInput.classList.add("wrong-flash");
+          else hangulAnswerEl.classList.add("wrong-flash");
+        }
+        scoreLabel.textContent = score;
+        renderDots();
+
+        if (current.direction === "toHangul") {
+          Array.from(keyboardRow.children).forEach(
+            (btn) => (btn.disabled = true),
+          );
+          backspaceBtn.disabled = true;
+          clearBtn.disabled = true;
+        } else {
+          textInput.disabled = true;
+        }
+
+        setTimeout(
+          () => {
+            qIndex++;
+            loadQuestion();
+          },
+          correct ? 700 : 1150,
+        );
+      }
+
+      function showDoneScreen() {
+        const pct = Math.round((score / TOTAL_QUESTIONS) * 100);
+        cardEl.innerHTML = `
+    <div class="done-screen">
+      <div class="mode-tag">Round complete</div>
+      <div class="big">${score} / ${TOTAL_QUESTIONS}</div>
+      <p>${pct}% correct — ${pct >= 85 ? "잘했어요! nicely done." : pct >= 60 ? "solid, keep drilling the misses." : "run it back, the vowels will stick."}</p>
+      <div class="controls" style="margin-top:22px;">
+        <button class="action ghost" id="chooseSetBtn">Choose set</button>
+        <button class="action primary" id="restartBtn">Shuffle & retry</button>
+      </div>
+    </div>
+  `;
+        document
+          .getElementById("restartBtn")
+          .addEventListener("click", startRound);
+        document
+          .getElementById("chooseSetBtn")
+          .addEventListener("click", () => {
+            showSelectScreen();
+          });
+      }
+
+      function startRound() {
+        score = 0;
+        qIndex = 0;
+        scoreLabel.textContent = 0;
+        buildQuizShell();
+        bindCardRefs();
+        buildQueue();
+        loadQuestion();
+      }
+
+      /* ---------- init ---------- */
+      renderSetCards();
+      showSelectScreen();
+    </script>
+  </body>
+</html>
