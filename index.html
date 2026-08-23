@@ -890,9 +890,9 @@
                 line-height: 1.5;
               "
             >
-              Each item flashes on screen (and gets read aloud) for a fixed time
-              — write your answer on paper. When the round ends, we show the
-              answer key so you can grade yourself.
+              Each item shows the romanization (and gets read aloud) for a fixed
+              time — you write the Hangul on paper. When the round ends, we show
+              the answer key so you can grade yourself.
             </p>
             <div
               style="
@@ -932,14 +932,14 @@
           </div>
           <div class="card" style="text-align: center">
             <div class="mode-tag" id="timedModeTag">
-              Look, then write the romanization
+              Read it, write the Hangul on paper
             </div>
             <div class="timer-wrap">
               <div class="timer-ring" id="timerRing">
                 <div class="timer-inner"><span id="timerSeconds">10</span></div>
               </div>
             </div>
-            <div class="prompt hangul" id="timedPrompt">ㅏ</div>
+            <div class="prompt latin" id="timedPrompt">a</div>
             <div class="controls">
               <button class="action ghost" id="timedSoundBtn">
                 🔊 Hear it
@@ -1497,7 +1497,7 @@
             key: "timed",
             icon: "⏱️",
             title: "Timed Writing",
-            desc: "A countdown per item — write your answers on paper, check against the key after.",
+            desc: "Romanization shown on a countdown — you write the Hangul on paper, key revealed after.",
           },
         ];
         modes.forEach((m) => {
@@ -1882,7 +1882,7 @@
       function beginTimedRound() {
         timedQueue = shuffle(VOWELS).map((v) => ({
           vowel: v,
-          direction: Math.random() < 0.5 ? "toLatin" : "toHangul",
+          direction: "toHangul",
         }));
         timedIndex = 0;
         timedSetup.classList.add("hidden");
@@ -1901,15 +1901,9 @@
         const item = timedQueue[timedIndex];
         timedIndexLabel.textContent = timedIndex + 1;
         timedPrompt.classList.remove("shake");
-        if (item.direction === "toLatin") {
-          timedModeTag.textContent = "Look, then write the romanization";
-          timedPrompt.className = "prompt hangul";
-          timedPrompt.textContent = item.vowel.hangul;
-        } else {
-          timedModeTag.textContent = "Look / listen, then write the Hangul";
-          timedPrompt.className = "prompt latin";
-          timedPrompt.textContent = item.vowel.latin;
-        }
+        timedModeTag.textContent = "Read it, write the Hangul on paper";
+        timedPrompt.className = "prompt latin";
+        timedPrompt.textContent = item.vowel.latin;
         setTimeout(() => autoSpeak(item.vowel.hangul), 150);
         timedRemaining = timedSecondsPerItem;
         updateTimerUI();
