@@ -1,489 +1,966 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>모음 연습 · Hangul Vowel Quiz</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --ink:#1c2333;
-    --ink-2:#252d42;
-    --paper:#eee7d8;
-    --paper-dim:#c9c0ac;
-    --jade:#4fa98c;
-    --jade-dim:#3a7d67;
-    --gold:#e3ac4d;
-    --coral:#e2584c;
-    --line: rgba(238,231,216,0.14);
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    min-height:100vh;
-    background:
-      radial-gradient(circle at 15% 10%, rgba(79,169,140,0.10), transparent 45%),
-      radial-gradient(circle at 90% 85%, rgba(227,172,77,0.08), transparent 40%),
-      var(--ink);
-    color:var(--paper);
-    font-family:'Space Grotesk', sans-serif;
-    display:flex;
-    justify-content:center;
-    padding:32px 16px 60px;
-  }
-  .stage{ width:100%; max-width:520px; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>모음 연습 · Hangul Vowel Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #1c2333;
+        --ink-2: #252d42;
+        --paper: #eee7d8;
+        --paper-dim: #c9c0ac;
+        --jade: #4fa98c;
+        --jade-dim: #3a7d67;
+        --gold: #e3ac4d;
+        --coral: #e2584c;
+        --line: rgba(238, 231, 216, 0.14);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        min-height: 100vh;
+        background:
+          radial-gradient(
+            circle at 15% 10%,
+            rgba(79, 169, 140, 0.1),
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at 90% 85%,
+            rgba(227, 172, 77, 0.08),
+            transparent 40%
+          ),
+          var(--ink);
+        color: var(--paper);
+        font-family: "Space Grotesk", sans-serif;
+        display: flex;
+        justify-content: center;
+        padding: 32px 16px 60px;
+      }
+      .stage {
+        width: 100%;
+        max-width: 520px;
+      }
 
-  header{ text-align:center; margin-bottom:22px; }
-  .eyebrow{
-    font-size:12px; letter-spacing:.24em; text-transform:uppercase;
-    color:var(--jade); margin-bottom:6px; font-weight:500;
-  }
-  h1{
-    font-family:'Noto Serif KR', serif; font-weight:900;
-    font-size:28px; margin:0; letter-spacing:.01em;
-  }
-  h1 span{ color:var(--gold); }
-  .sub{ color:var(--paper-dim); font-size:13.5px; margin-top:6px; }
+      header {
+        text-align: center;
+        margin-bottom: 22px;
+      }
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--jade);
+        margin-bottom: 6px;
+        font-weight: 500;
+      }
+      h1 {
+        font-family: "Noto Serif KR", serif;
+        font-weight: 900;
+        font-size: 28px;
+        margin: 0;
+        letter-spacing: 0.01em;
+      }
+      h1 span {
+        color: var(--gold);
+      }
+      .sub {
+        color: var(--paper-dim);
+        font-size: 13.5px;
+        margin-top: 6px;
+      }
 
-  /* ---- Card-choice screens (set select + mode select) ---- */
-  .set-cards{ display:flex; flex-direction:column; gap:14px; }
-  .set-card{
-    position:relative;
-    display:flex; align-items:center; gap:18px;
-    background:linear-gradient(180deg, var(--ink-2), var(--ink));
-    border:1.5px solid var(--line);
-    border-radius:18px;
-    padding:20px 20px;
-    cursor:pointer;
-    text-align:left;
-    transition:border-color .15s, transform .12s, background .15s;
-  }
-  .set-card:hover{ border-color:var(--jade-dim); transform:translateY(-2px); }
-  .set-card:active{ transform:translateY(0px) scale(.99); }
-  .set-card .glyphs{
-    font-family:'Noto Serif KR', serif; font-weight:700; font-size:26px;
-    color:var(--gold); min-width:92px; line-height:1.15;
-    display:flex; flex-wrap:wrap; gap:0 6px; align-items:center;
-  }
-  .set-card .glyphs.icon{ font-size:30px; min-width:56px; justify-content:center; }
-  .set-card .info{ flex:1; }
-  .set-card .tag{
-    font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
-    color:var(--jade); font-weight:600; margin-bottom:4px;
-  }
-  .set-card h3{
-    font-family:'Noto Serif KR', serif; font-size:19px; margin:0 0 4px; font-weight:700;
-  }
-  .set-card p{ margin:0; font-size:12.5px; color:var(--paper-dim); }
-  .set-card .arrow{
-    font-size:18px; color:var(--paper-dim); transition:transform .15s, color .15s;
-  }
-  .set-card:hover .arrow{ transform:translateX(4px); color:var(--gold); }
+      /* ---- Card-choice screens (set select + mode select) ---- */
+      .set-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .set-card {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        background: linear-gradient(180deg, var(--ink-2), var(--ink));
+        border: 1.5px solid var(--line);
+        border-radius: 18px;
+        padding: 20px 20px;
+        cursor: pointer;
+        text-align: left;
+        transition:
+          border-color 0.15s,
+          transform 0.12s,
+          background 0.15s;
+      }
+      .set-card:hover {
+        border-color: var(--jade-dim);
+        transform: translateY(-2px);
+      }
+      .set-card:active {
+        transform: translateY(0px) scale(0.99);
+      }
+      .set-card .glyphs {
+        font-family: "Noto Serif KR", serif;
+        font-weight: 700;
+        font-size: 26px;
+        color: var(--gold);
+        min-width: 92px;
+        line-height: 1.15;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 6px;
+        align-items: center;
+      }
+      .set-card .glyphs.icon {
+        font-size: 30px;
+        min-width: 56px;
+        justify-content: center;
+      }
+      .set-card .info {
+        flex: 1;
+      }
+      .set-card .tag {
+        font-size: 10.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--jade);
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .set-card h3 {
+        font-family: "Noto Serif KR", serif;
+        font-size: 19px;
+        margin: 0 0 4px;
+        font-weight: 700;
+      }
+      .set-card p {
+        margin: 0;
+        font-size: 12.5px;
+        color: var(--paper-dim);
+      }
+      .set-card .arrow {
+        font-size: 18px;
+        color: var(--paper-dim);
+        transition:
+          transform 0.15s,
+          color 0.15s;
+      }
+      .set-card:hover .arrow {
+        transform: translateX(4px);
+        color: var(--gold);
+      }
 
-  /* ---- Shared quiz/flash screen bits ---- */
-  .stats{
-    display:flex; justify-content:space-between; align-items:center;
-    margin:22px 0 14px; font-size:13px; color:var(--paper-dim);
-  }
-  .stats b{ color:var(--paper); font-weight:700; }
-  .dots{ display:flex; gap:6px; flex-wrap:wrap; max-width:280px; justify-content:flex-end; }
-  .dot{ width:7px; height:7px; border-radius:50%; background:rgba(238,231,216,0.18); }
-  .dot.done{ background:var(--jade); }
-  .dot.miss{ background:var(--coral); }
+      /* ---- Shared quiz/flash screen bits ---- */
+      .stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 22px 0 14px;
+        font-size: 13px;
+        color: var(--paper-dim);
+      }
+      .stats b {
+        color: var(--paper);
+        font-weight: 700;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        max-width: 280px;
+        justify-content: flex-end;
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(238, 231, 216, 0.18);
+      }
+      .dot.done {
+        background: var(--jade);
+      }
+      .dot.miss {
+        background: var(--coral);
+      }
 
-  .back-link{
-    display:inline-flex; align-items:center; gap:6px; background:none; border:none;
-    color:var(--paper-dim); font-family:'Space Grotesk', sans-serif; font-size:12.5px;
-    cursor:pointer; padding:0; margin-bottom:16px; letter-spacing:.02em;
-    transition:color .12s;
-  }
-  .back-link:hover{ color:var(--paper); }
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: none;
+        border: none;
+        color: var(--paper-dim);
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 12.5px;
+        cursor: pointer;
+        padding: 0;
+        margin-bottom: 16px;
+        letter-spacing: 0.02em;
+        transition: color 0.12s;
+      }
+      .back-link:hover {
+        color: var(--paper);
+      }
 
-  .card{
-    position:relative;
-    background:linear-gradient(180deg, var(--ink-2), var(--ink));
-    border:1px solid var(--line);
-    border-radius:20px;
-    padding:46px 28px 34px;
-    text-align:center;
-    box-shadow:0 24px 50px -20px rgba(0,0,0,0.55);
-    overflow:hidden;
-  }
-  .card::before{
-    content:"";
-    position:absolute; inset:0;
-    background: repeating-linear-gradient(90deg, transparent, transparent 38px, rgba(238,231,216,0.025) 38px, rgba(238,231,216,0.025) 39px);
-    pointer-events:none;
-  }
-  .mode-tag{
-    display:inline-block; font-size:11px; letter-spacing:.14em; text-transform:uppercase;
-    color:var(--gold); border:1px solid rgba(227,172,77,0.35); border-radius:999px;
-    padding:4px 12px; margin-bottom:22px; font-weight:500;
-  }
-  .prompt{
-    font-family:'Noto Serif KR', serif;
-    font-weight:900;
-    line-height:1;
-    min-height:104px;
-    display:flex; align-items:center; justify-content:center;
-    transition:transform .18s ease, opacity .18s ease;
-  }
-  .prompt.hangul{ font-size:98px; color:var(--paper); }
-  .prompt.latin{ font-size:48px; color:var(--paper); letter-spacing:.02em; }
-  .prompt.shake{ animation:shake .32s; }
-  @keyframes shake{
-    20%{ transform:translateX(-8px); } 40%{ transform:translateX(7px); }
-    60%{ transform:translateX(-5px); } 80%{ transform:translateX(4px); } 100%{ transform:translateX(0); }
-  }
+      .card {
+        position: relative;
+        background: linear-gradient(180deg, var(--ink-2), var(--ink));
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 46px 28px 34px;
+        text-align: center;
+        box-shadow: 0 24px 50px -20px rgba(0, 0, 0, 0.55);
+        overflow: hidden;
+      }
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 38px,
+          rgba(238, 231, 216, 0.025) 38px,
+          rgba(238, 231, 216, 0.025) 39px
+        );
+        pointer-events: none;
+      }
+      .mode-tag {
+        display: inline-block;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--gold);
+        border: 1px solid rgba(227, 172, 77, 0.35);
+        border-radius: 999px;
+        padding: 4px 12px;
+        margin-bottom: 22px;
+        font-weight: 500;
+      }
+      .prompt {
+        font-family: "Noto Serif KR", serif;
+        font-weight: 900;
+        line-height: 1;
+        min-height: 104px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          transform 0.18s ease,
+          opacity 0.18s ease;
+      }
+      .prompt.hangul {
+        font-size: 98px;
+        color: var(--paper);
+      }
+      .prompt.latin {
+        font-size: 48px;
+        color: var(--paper);
+        letter-spacing: 0.02em;
+      }
+      .prompt.shake {
+        animation: shake 0.32s;
+      }
+      @keyframes shake {
+        20% {
+          transform: translateX(-8px);
+        }
+        40% {
+          transform: translateX(7px);
+        }
+        60% {
+          transform: translateX(-5px);
+        }
+        80% {
+          transform: translateX(4px);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
 
-  .feedback{
-    min-height:22px; font-size:14px; font-weight:500; margin-top:14px;
-  }
-  .feedback.correct{ color:var(--jade); }
-  .feedback.wrong{ color:var(--coral); }
+      .feedback {
+        min-height: 22px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-top: 14px;
+      }
+      .feedback.correct {
+        color: var(--jade);
+      }
+      .feedback.wrong {
+        color: var(--coral);
+      }
 
-  .answer-row{ margin-top:26px; }
-  input.text-answer{
-    width:100%; background:rgba(238,231,216,0.06); border:1.5px solid var(--line);
-    border-radius:12px; padding:14px 16px; font-size:20px; color:var(--paper);
-    font-family:'Space Grotesk', sans-serif; text-align:center; outline:none;
-    transition:border-color .15s;
-  }
-  input.text-answer:focus{ border-color:var(--jade); }
-  input.text-answer.wrong-flash{ border-color:var(--coral); }
-  input.text-answer.correct-flash{ border-color:var(--jade); }
+      .answer-row {
+        margin-top: 26px;
+      }
+      input.text-answer {
+        width: 100%;
+        background: rgba(238, 231, 216, 0.06);
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 20px;
+        color: var(--paper);
+        font-family: "Space Grotesk", sans-serif;
+        text-align: center;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      input.text-answer:focus {
+        border-color: var(--jade);
+      }
+      input.text-answer.wrong-flash {
+        border-color: var(--coral);
+      }
+      input.text-answer.correct-flash {
+        border-color: var(--jade);
+      }
 
-  .keyboard{
-    margin-top:24px; display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
-  }
-  .key{
-    font-family:'Noto Serif KR', serif; font-weight:700; font-size:26px;
-    background:rgba(238,231,216,0.05); border:1.5px solid var(--line); color:var(--paper);
-    border-radius:12px; padding:14px 0; cursor:pointer;
-    transition:background .12s, border-color .12s, transform .08s;
-  }
-  .key:hover{ background:rgba(79,169,140,0.14); border-color:var(--jade-dim); }
-  .key:active{ transform:scale(.94); }
+      .keyboard {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+      .key {
+        font-family: "Noto Serif KR", serif;
+        font-weight: 700;
+        font-size: 26px;
+        background: rgba(238, 231, 216, 0.05);
+        border: 1.5px solid var(--line);
+        color: var(--paper);
+        border-radius: 12px;
+        padding: 14px 0;
+        cursor: pointer;
+        transition:
+          background 0.12s,
+          border-color 0.12s,
+          transform 0.08s;
+      }
+      .key:hover {
+        background: rgba(79, 169, 140, 0.14);
+        border-color: var(--jade-dim);
+      }
+      .key:active {
+        transform: scale(0.94);
+      }
 
-  .controls{ display:flex; gap:10px; margin-top:20px; }
-  button.action{
-    flex:1; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:14px;
-    padding:13px 0; border-radius:12px; border:1.5px solid var(--line);
-    background:transparent; color:var(--paper); cursor:pointer;
-    letter-spacing:.02em; transition:background .15s, border-color .15s;
-  }
-  button.action.primary{
-    background:var(--jade); border-color:var(--jade); color:#0e1a17;
-  }
-  button.action.primary:hover{ background:var(--jade-dim); border-color:var(--jade-dim); }
-  button.action.ghost:hover{ border-color:var(--paper-dim); }
+      .controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      button.action {
+        flex: 1;
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 13px 0;
+        border-radius: 12px;
+        border: 1.5px solid var(--line);
+        background: transparent;
+        color: var(--paper);
+        cursor: pointer;
+        letter-spacing: 0.02em;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+      button.action.primary {
+        background: var(--jade);
+        border-color: var(--jade);
+        color: #0e1a17;
+      }
+      button.action.primary:hover {
+        background: var(--jade-dim);
+        border-color: var(--jade-dim);
+      }
+      button.action.ghost:hover {
+        border-color: var(--paper-dim);
+      }
 
-  .hangul-answer{
-    width:100%; min-height:64px; background:rgba(238,231,216,0.06); border:1.5px solid var(--line);
-    border-radius:12px; padding:10px 16px; margin-top:26px;
-    display:flex; align-items:center; justify-content:center; gap:6px;
-    font-family:'Noto Serif KR', serif; font-weight:700; font-size:34px; color:var(--paper);
-    transition:border-color .15s;
-  }
-  .hangul-answer.placeholder{ color:var(--paper-dim); font-size:14px; font-family:'Space Grotesk', sans-serif; font-weight:500; }
-  .hangul-answer.wrong-flash{ border-color:var(--coral); }
-  .hangul-answer.correct-flash{ border-color:var(--jade); }
+      .hangul-answer {
+        width: 100%;
+        min-height: 64px;
+        background: rgba(238, 231, 216, 0.06);
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 16px;
+        margin-top: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-family: "Noto Serif KR", serif;
+        font-weight: 700;
+        font-size: 34px;
+        color: var(--paper);
+        transition: border-color 0.15s;
+      }
+      .hangul-answer.placeholder {
+        color: var(--paper-dim);
+        font-size: 14px;
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 500;
+      }
+      .hangul-answer.wrong-flash {
+        border-color: var(--coral);
+      }
+      .hangul-answer.correct-flash {
+        border-color: var(--jade);
+      }
 
-  .kb-utility{ display:flex; gap:8px; margin-top:10px; }
-  .kb-utility button{
-    flex:1; font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:600;
-    letter-spacing:.04em; text-transform:uppercase; color:var(--paper-dim);
-    background:transparent; border:1.5px solid var(--line); border-radius:10px;
-    padding:9px 0; cursor:pointer; transition:border-color .12s, color .12s;
-  }
-  .kb-utility button:hover{ border-color:var(--paper-dim); color:var(--paper); }
+      .kb-utility {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .kb-utility button {
+        flex: 1;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--paper-dim);
+        background: transparent;
+        border: 1.5px solid var(--line);
+        border-radius: 10px;
+        padding: 9px 0;
+        cursor: pointer;
+        transition:
+          border-color 0.12s,
+          color 0.12s;
+      }
+      .kb-utility button:hover {
+        border-color: var(--paper-dim);
+        color: var(--paper);
+      }
 
-  .done-screen{ text-align:center; padding:20px 4px; }
-  .done-screen .big{
-    font-family:'Noto Serif KR', serif; font-weight:900; font-size:44px; color:var(--gold);
-  }
-  .done-screen p{ color:var(--paper-dim); font-size:14px; margin-top:6px; }
+      .done-screen {
+        text-align: center;
+        padding: 20px 4px;
+      }
+      .done-screen .big {
+        font-family: "Noto Serif KR", serif;
+        font-weight: 900;
+        font-size: 44px;
+        color: var(--gold);
+      }
+      .done-screen p {
+        color: var(--paper-dim);
+        font-size: 14px;
+        margin-top: 6px;
+      }
 
-  /* ---- Flashcards ---- */
-  .flash-wrap{ perspective:1400px; margin-bottom:22px; }
-  .flashcard{
-    position:relative; width:100%; height:230px; cursor:pointer;
-    transform-style:preserve-3d; transition:transform .5s cubic-bezier(.4,.2,.2,1);
-  }
-  .flashcard.flipped{ transform:rotateY(180deg); }
-  .flash-face{
-    position:absolute; inset:0; backface-visibility:hidden;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    border-radius:20px; border:1px solid var(--line);
-    background:linear-gradient(180deg, var(--ink-2), var(--ink));
-    box-shadow:0 24px 50px -20px rgba(0,0,0,0.55);
-  }
-  .flash-front .glyph{ font-family:'Noto Serif KR', serif; font-weight:900; font-size:92px; color:var(--paper); }
-  .flash-back{ transform:rotateY(180deg); }
-  .flash-back .glyph{ font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:42px; color:var(--gold); letter-spacing:.02em; }
-  .flash-face .label{
-    font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--paper-dim);
-    margin-top:12px;
-  }
+      /* ---- Flashcards ---- */
+      .flash-wrap {
+        perspective: 1400px;
+        margin-bottom: 22px;
+      }
+      .flashcard {
+        position: relative;
+        width: 100%;
+        height: 230px;
+        cursor: pointer;
+        transform-style: preserve-3d;
+        transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+      }
+      .flashcard.flipped {
+        transform: rotateY(180deg);
+      }
+      .flash-face {
+        position: absolute;
+        inset: 0;
+        backface-visibility: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, var(--ink-2), var(--ink));
+        box-shadow: 0 24px 50px -20px rgba(0, 0, 0, 0.55);
+      }
+      .flash-front .glyph {
+        font-family: "Noto Serif KR", serif;
+        font-weight: 900;
+        font-size: 92px;
+        color: var(--paper);
+      }
+      .flash-back {
+        transform: rotateY(180deg);
+      }
+      .flash-back .glyph {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 42px;
+        color: var(--gold);
+        letter-spacing: 0.02em;
+      }
+      .flash-face .label {
+        font-size: 10.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--paper-dim);
+        margin-top: 12px;
+      }
 
-  .hidden{ display:none !important; }
+      .hidden {
+        display: none !important;
+      }
 
-  @media (max-width:400px){
-    .prompt.hangul{ font-size:74px; }
-    .card{ padding:36px 18px 26px; }
-    .set-card .glyphs{ min-width:78px; font-size:21px; }
-    .flash-front .glyph{ font-size:70px; }
-  }
-</style>
-</head>
-<body>
-<div class="stage">
-  <header>
-    <div class="eyebrow">모음 연습 · vowel drill</div>
-    <h1>Hangul <span>Vowel</span> Quiz</h1>
-    <div class="sub" id="headerSub">Choose a set to practice</div>
-  </header>
+      /* ---- Custom mix picker ---- */
+      .chip-group {
+        margin-bottom: 20px;
+      }
+      .chip-group h4 {
+        font-family: "Noto Serif KR", serif;
+        font-size: 12px;
+        color: var(--jade);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin: 0 0 9px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+      }
+      .chip-group h4 .grp-actions button {
+        background: none;
+        border: none;
+        color: var(--paper-dim);
+        font-size: 10.5px;
+        cursor: pointer;
+        text-decoration: underline;
+        font-family: "Space Grotesk", sans-serif;
+        letter-spacing: 0;
+        text-transform: none;
+        padding: 0;
+        margin-left: 8px;
+      }
+      .chip-group h4 .grp-actions button:hover {
+        color: var(--paper);
+      }
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .chip {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        background: rgba(238, 231, 216, 0.05);
+        border: 1.5px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 12px;
+        cursor: pointer;
+        user-select: none;
+        font-family: "Noto Serif KR", serif;
+        font-size: 16px;
+        color: var(--paper);
+        transition:
+          border-color 0.12s,
+          background 0.12s;
+      }
+      .chip .latin {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 11px;
+        color: var(--paper-dim);
+      }
+      .chip:hover {
+        border-color: var(--paper-dim);
+      }
+      .chip.selected {
+        border-color: var(--jade);
+        background: rgba(79, 169, 140, 0.16);
+      }
+      .chip.selected .latin {
+        color: var(--jade);
+      }
 
-  <!-- Screen 1: pick vowel set -->
-  <div id="selectScreen">
-    <div class="set-cards" id="setCards"></div>
-  </div>
+      .custom-footer {
+        position: sticky;
+        bottom: 14px;
+        margin-top: 6px;
+        background: linear-gradient(180deg, var(--ink-2), var(--ink));
+        border: 1.5px solid var(--line);
+        border-radius: 16px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 20px 40px -18px rgba(0, 0, 0, 0.6);
+      }
+      .custom-footer .count {
+        font-size: 13px;
+        color: var(--paper-dim);
+        flex: 1;
+      }
+      .custom-footer .count b {
+        color: var(--gold);
+      }
+      .custom-footer button {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 13.5px;
+        padding: 10px 18px;
+        border-radius: 10px;
+        border: 1.5px solid var(--jade);
+        background: var(--jade);
+        color: #0e1a17;
+        cursor: pointer;
+      }
+      .custom-footer button:disabled {
+        background: transparent;
+        color: var(--paper-dim);
+        border-color: var(--line);
+        cursor: not-allowed;
+      }
 
-  <!-- Screen 2: pick flashcards or quiz -->
-  <div id="modeScreen" class="hidden">
-    <button class="back-link" id="modeBackBtn">← back to sets</button>
-    <div class="set-cards" id="modeCards"></div>
-  </div>
+      @media (max-width: 400px) {
+        .prompt.hangul {
+          font-size: 74px;
+        }
+        .card {
+          padding: 36px 18px 26px;
+        }
+        .set-card .glyphs {
+          min-width: 78px;
+          font-size: 21px;
+        }
+        .flash-front .glyph {
+          font-size: 70px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <header>
+        <div class="eyebrow">모음 연습 · vowel drill</div>
+        <h1>Hangul <span>Vowel</span> Quiz</h1>
+        <div class="sub" id="headerSub">Choose a set to practice</div>
+      </header>
 
-  <!-- Screen 3a: quiz -->
-  <div id="quizScreen" class="hidden">
-    <button class="back-link" id="quizBackBtn">← back</button>
-
-    <div class="stats">
-      <div>Score <b id="scoreLabel">0</b> / <span id="totalLabel">0</span></div>
-      <div class="dots" id="dots"></div>
-    </div>
-
-    <div class="card" id="card">
-      <div class="mode-tag" id="modeTag">Read the Hangul, type romanization</div>
-      <div class="prompt hangul" id="prompt">ㅏ</div>
-      <div class="feedback" id="feedback"></div>
-
-      <div class="answer-row" id="textAnswerRow">
-        <input class="text-answer" id="textAnswer" placeholder="type romanization…" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <!-- Screen 1: pick vowel set -->
+      <div id="selectScreen">
+        <div class="set-cards" id="setCards"></div>
       </div>
 
-      <div id="hangulAnswerWrap" class="hidden">
-        <div class="hangul-answer placeholder" id="hangulAnswer">tap the letters below</div>
-        <div class="keyboard" id="keyboardRow"></div>
-        <div class="kb-utility">
-          <button type="button" id="backspaceBtn">⌫ Backspace</button>
-          <button type="button" id="clearBtn">Clear</button>
+      <!-- Screen 2: pick flashcards or quiz -->
+      <div id="modeScreen" class="hidden">
+        <button class="back-link" id="modeBackBtn">← back to sets</button>
+        <div class="set-cards" id="modeCards"></div>
+      </div>
+
+      <!-- Screen 1b: build a custom mix -->
+      <div id="customScreen" class="hidden">
+        <button class="back-link" id="customBackBtn">← back to sets</button>
+        <div id="customGroups"></div>
+        <div class="custom-footer">
+          <div class="count"><b id="customCount">0</b> selected</div>
+          <button
+            type="button"
+            id="customClearBtn"
+            style="
+              background: transparent;
+              color: var(--paper-dim);
+              border-color: var(--line);
+            "
+          >
+            Clear
+          </button>
+          <button type="button" id="customContinueBtn" disabled>
+            Continue →
+          </button>
         </div>
       </div>
 
-      <div class="controls">
-        <button class="action ghost" id="skipBtn">Skip</button>
-        <button class="action primary" id="checkBtn">Check</button>
+      <!-- Screen 3a: quiz -->
+      <div id="quizScreen" class="hidden">
+        <button class="back-link" id="quizBackBtn">← back</button>
+
+        <div class="stats">
+          <div>
+            Score <b id="scoreLabel">0</b> / <span id="totalLabel">0</span>
+          </div>
+          <div class="dots" id="dots"></div>
+        </div>
+
+        <div class="card" id="card">
+          <div class="mode-tag" id="modeTag">
+            Read the Hangul, type romanization
+          </div>
+          <div class="prompt hangul" id="prompt">ㅏ</div>
+          <div class="feedback" id="feedback"></div>
+
+          <div class="answer-row" id="textAnswerRow">
+            <input
+              class="text-answer"
+              id="textAnswer"
+              placeholder="type romanization…"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+            />
+          </div>
+
+          <div id="hangulAnswerWrap" class="hidden">
+            <div class="hangul-answer placeholder" id="hangulAnswer">
+              tap the letters below
+            </div>
+            <div class="keyboard" id="keyboardRow"></div>
+            <div class="kb-utility">
+              <button type="button" id="backspaceBtn">⌫ Backspace</button>
+              <button type="button" id="clearBtn">Clear</button>
+            </div>
+          </div>
+
+          <div class="controls">
+            <button class="action ghost" id="skipBtn">Skip</button>
+            <button class="action primary" id="checkBtn">Check</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 3b: flashcards -->
+      <div id="flashScreen" class="hidden">
+        <button class="back-link" id="flashBackBtn">← back</button>
+
+        <div class="stats">
+          <div>
+            Card <b id="flashIndexLabel">1</b> /
+            <span id="flashTotalLabel">8</span>
+          </div>
+          <button
+            class="back-link"
+            id="flashShuffleBtn"
+            style="margin-bottom: 0"
+          >
+            ⤳ shuffle
+          </button>
+        </div>
+
+        <div class="flash-wrap">
+          <div class="flashcard" id="flashcard">
+            <div class="flash-face flash-front" id="flashFront"></div>
+            <div class="flash-face flash-back" id="flashBack"></div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="action ghost" id="flashPrevBtn">← Prev</button>
+          <button class="action primary" id="flashFlipBtn">Flip</button>
+          <button class="action ghost" id="flashNextBtn">Next →</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Screen 3b: flashcards -->
-  <div id="flashScreen" class="hidden">
-    <button class="back-link" id="flashBackBtn">← back</button>
+    <script>
+      const VOWEL_SETS = {
+        consonants: {
+          label: "14 Basic Consonants",
+          tag: "Level 1",
+          desc: "ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅅ ㅇ ㅈ ㅊ ㅋ ㅌ ㅍ ㅎ — the building blocks",
+          glyphs: "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ",
+          vowels: [
+            { hangul: "ㄱ", latin: "g" },
+            { hangul: "ㄴ", latin: "n" },
+            { hangul: "ㄷ", latin: "d" },
+            { hangul: "ㄹ", latin: "r" },
+            { hangul: "ㅁ", latin: "m" },
+            { hangul: "ㅂ", latin: "b" },
+            { hangul: "ㅅ", latin: "s" },
+            { hangul: "ㅇ", latin: "ng" },
+            { hangul: "ㅈ", latin: "j" },
+            { hangul: "ㅊ", latin: "ch" },
+            { hangul: "ㅋ", latin: "k" },
+            { hangul: "ㅌ", latin: "t" },
+            { hangul: "ㅍ", latin: "p" },
+            { hangul: "ㅎ", latin: "h" },
+          ],
+        },
+        doubleConsonants: {
+          label: "5 Double Consonants",
+          tag: "Level 2",
+          desc: "ㄲ ㄸ ㅃ ㅆ ㅉ — tensed 쌍자음, sharper versions of the plain ones",
+          glyphs: "ㄲㄸㅃㅆㅉ",
+          vowels: [
+            { hangul: "ㄲ", latin: "kk" },
+            { hangul: "ㄸ", latin: "tt" },
+            { hangul: "ㅃ", latin: "pp" },
+            { hangul: "ㅆ", latin: "ss" },
+            { hangul: "ㅉ", latin: "jj" },
+          ],
+        },
+        basic: {
+          label: "8 Basic Vowels",
+          tag: "Level 3",
+          desc: "ㅏ ㅓ ㅗ ㅜ ㅡ ㅣ ㅐ ㅔ — the foundation sounds",
+          glyphs: "ㅏㅓㅗㅜㅡㅣㅐㅔ",
+          vowels: [
+            { hangul: "ㅏ", latin: "a" },
+            { hangul: "ㅓ", latin: "eo" },
+            { hangul: "ㅗ", latin: "o" },
+            { hangul: "ㅜ", latin: "u" },
+            { hangul: "ㅡ", latin: "eu" },
+            { hangul: "ㅣ", latin: "i" },
+            { hangul: "ㅐ", latin: "ae" },
+            { hangul: "ㅔ", latin: "e" },
+          ],
+        },
+        y: {
+          label: "6 Y Sounds",
+          tag: "Level 4",
+          desc: 'ㅑ ㅕ ㅛ ㅠ ㅒ ㅖ — iotized "y-" vowels',
+          glyphs: "ㅑㅕㅛㅠㅒㅖ",
+          vowels: [
+            { hangul: "ㅑ", latin: "ya" },
+            { hangul: "ㅕ", latin: "yeo" },
+            { hangul: "ㅛ", latin: "yo" },
+            { hangul: "ㅠ", latin: "yu" },
+            { hangul: "ㅒ", latin: "yae" },
+            { hangul: "ㅖ", latin: "ye" },
+          ],
+        },
+        w: {
+          label: "7 W Sounds",
+          tag: "Level 5",
+          desc: 'ㅘ ㅝ ㅚ ㅙ ㅞ ㅟ ㅢ — glide "w-" vowels',
+          glyphs: "ㅘㅝㅚㅙㅞㅟㅢ",
+          vowels: [
+            { hangul: "ㅘ", latin: "wa" },
+            { hangul: "ㅝ", latin: "wo" },
+            { hangul: "ㅚ", latin: "oe" },
+            { hangul: "ㅙ", latin: "wae" },
+            { hangul: "ㅞ", latin: "we" },
+            { hangul: "ㅟ", latin: "wi" },
+            { hangul: "ㅢ", latin: "ui" },
+          ],
+        },
+        doubleFinal: {
+          label: "11 Double Final Consonants",
+          tag: "Level 6",
+          desc: "ㄳ ㄵ ㄶ ㄺ ㄻ ㄼ ㄽ ㄾ ㄿ ㅀ ㅄ — 겹받침, consonant clusters used as batchim",
+          glyphs: "ㄳㄵㄶㄺㄻㄼㄽㄾㄿㅀㅄ",
+          vowels: [
+            { hangul: "ㄳ", latin: "gs" },
+            { hangul: "ㄵ", latin: "nj" },
+            { hangul: "ㄶ", latin: "nh" },
+            { hangul: "ㄺ", latin: "lg" },
+            { hangul: "ㄻ", latin: "lm" },
+            { hangul: "ㄼ", latin: "lb" },
+            { hangul: "ㄽ", latin: "ls" },
+            { hangul: "ㄾ", latin: "lt" },
+            { hangul: "ㄿ", latin: "lp" },
+            { hangul: "ㅀ", latin: "lh" },
+            { hangul: "ㅄ", latin: "bs" },
+          ],
+        },
+      };
 
-    <div class="stats">
-      <div>Card <b id="flashIndexLabel">1</b> / <span id="flashTotalLabel">8</span></div>
-      <button class="back-link" id="flashShuffleBtn" style="margin-bottom:0;">⤳ shuffle</button>
-    </div>
+      let activeSetKey = null;
+      let VOWELS = [];
+      let TOTAL_QUESTIONS = 0;
+      let customSelected = new Map(); // hangul -> {hangul, latin}
 
-    <div class="flash-wrap">
-      <div class="flashcard" id="flashcard">
-        <div class="flash-face flash-front" id="flashFront"></div>
-        <div class="flash-face flash-back" id="flashBack"></div>
-      </div>
-    </div>
+      let queue = [];
+      let qIndex = 0;
+      let score = 0;
+      let results = [];
+      let current = null;
+      let answered = false;
+      let typedHangul = "";
 
-    <div class="controls">
-      <button class="action ghost" id="flashPrevBtn">← Prev</button>
-      <button class="action primary" id="flashFlipBtn">Flip</button>
-      <button class="action ghost" id="flashNextBtn">Next →</button>
-    </div>
-  </div>
-</div>
+      let flashList = [];
+      let flashIndex = 0;
+      let flashFlipped = false;
 
-<script>
-const VOWEL_SETS = {
-  consonants: {
-    label: '14 Basic Consonants',
-    tag: 'Level 1',
-    desc: 'ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅅ ㅇ ㅈ ㅊ ㅋ ㅌ ㅍ ㅎ — the building blocks',
-    glyphs: 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ',
-    vowels: [
-      { hangul:'ㄱ', latin:'g' },
-      { hangul:'ㄴ', latin:'n' },
-      { hangul:'ㄷ', latin:'d' },
-      { hangul:'ㄹ', latin:'r' },
-      { hangul:'ㅁ', latin:'m' },
-      { hangul:'ㅂ', latin:'b' },
-      { hangul:'ㅅ', latin:'s' },
-      { hangul:'ㅇ', latin:'ng' },
-      { hangul:'ㅈ', latin:'j' },
-      { hangul:'ㅊ', latin:'ch' },
-      { hangul:'ㅋ', latin:'k' },
-      { hangul:'ㅌ', latin:'t' },
-      { hangul:'ㅍ', latin:'p' },
-      { hangul:'ㅎ', latin:'h' },
-    ]
-  },
-  doubleConsonants: {
-    label: '5 Double Consonants',
-    tag: 'Level 2',
-    desc: 'ㄲ ㄸ ㅃ ㅆ ㅉ — tensed 쌍자음, sharper versions of the plain ones',
-    glyphs: 'ㄲㄸㅃㅆㅉ',
-    vowels: [
-      { hangul:'ㄲ', latin:'kk' },
-      { hangul:'ㄸ', latin:'tt' },
-      { hangul:'ㅃ', latin:'pp' },
-      { hangul:'ㅆ', latin:'ss' },
-      { hangul:'ㅉ', latin:'jj' },
-    ]
-  },
-  basic: {
-    label: '8 Basic Vowels',
-    tag: 'Level 3',
-    desc: 'ㅏ ㅓ ㅗ ㅜ ㅡ ㅣ ㅐ ㅔ — the foundation sounds',
-    glyphs: 'ㅏㅓㅗㅜㅡㅣㅐㅔ',
-    vowels: [
-      { hangul:'ㅏ', latin:'a' },
-      { hangul:'ㅓ', latin:'eo' },
-      { hangul:'ㅗ', latin:'o' },
-      { hangul:'ㅜ', latin:'u' },
-      { hangul:'ㅡ', latin:'eu' },
-      { hangul:'ㅣ', latin:'i' },
-      { hangul:'ㅐ', latin:'ae' },
-      { hangul:'ㅔ', latin:'e' },
-    ]
-  },
-  y: {
-    label: '6 Y Sounds',
-    tag: 'Level 4',
-    desc: 'ㅑ ㅕ ㅛ ㅠ ㅒ ㅖ — iotized "y-" vowels',
-    glyphs: 'ㅑㅕㅛㅠㅒㅖ',
-    vowels: [
-      { hangul:'ㅑ', latin:'ya' },
-      { hangul:'ㅕ', latin:'yeo' },
-      { hangul:'ㅛ', latin:'yo' },
-      { hangul:'ㅠ', latin:'yu' },
-      { hangul:'ㅒ', latin:'yae' },
-      { hangul:'ㅖ', latin:'ye' },
-    ]
-  },
-  w: {
-    label: '7 W Sounds',
-    tag: 'Level 5',
-    desc: 'ㅘ ㅝ ㅚ ㅙ ㅞ ㅟ ㅢ — glide "w-" vowels',
-    glyphs: 'ㅘㅝㅚㅙㅞㅟㅢ',
-    vowels: [
-      { hangul:'ㅘ', latin:'wa' },
-      { hangul:'ㅝ', latin:'wo' },
-      { hangul:'ㅚ', latin:'oe' },
-      { hangul:'ㅙ', latin:'wae' },
-      { hangul:'ㅞ', latin:'we' },
-      { hangul:'ㅟ', latin:'wi' },
-      { hangul:'ㅢ', latin:'ui' },
-    ]
-  },
-  doubleFinal: {
-    label: '11 Double Final Consonants',
-    tag: 'Level 6',
-    desc: 'ㄳ ㄵ ㄶ ㄺ ㄻ ㄼ ㄽ ㄾ ㄿ ㅀ ㅄ — 겹받침, consonant clusters used as batchim',
-    glyphs: 'ㄳㄵㄶㄺㄻㄼㄽㄾㄿㅀㅄ',
-    vowels: [
-      { hangul:'ㄳ', latin:'gs' },
-      { hangul:'ㄵ', latin:'nj' },
-      { hangul:'ㄶ', latin:'nh' },
-      { hangul:'ㄺ', latin:'lg' },
-      { hangul:'ㄻ', latin:'lm' },
-      { hangul:'ㄼ', latin:'lb' },
-      { hangul:'ㄽ', latin:'ls' },
-      { hangul:'ㄾ', latin:'lt' },
-      { hangul:'ㄿ', latin:'lp' },
-      { hangul:'ㅀ', latin:'lh' },
-      { hangul:'ㅄ', latin:'bs' },
-    ]
-  }
-};
+      const selectScreen = document.getElementById("selectScreen");
+      const modeScreen = document.getElementById("modeScreen");
+      const customScreen = document.getElementById("customScreen");
+      const quizScreen = document.getElementById("quizScreen");
+      const flashScreen = document.getElementById("flashScreen");
+      const setCardsEl = document.getElementById("setCards");
+      const modeCardsEl = document.getElementById("modeCards");
+      const customGroupsEl = document.getElementById("customGroups");
+      const customCountEl = document.getElementById("customCount");
+      const customContinueBtn = document.getElementById("customContinueBtn");
+      const customClearBtn = document.getElementById("customClearBtn");
+      const customBackBtn = document.getElementById("customBackBtn");
+      const headerSub = document.getElementById("headerSub");
+      const modeBackBtn = document.getElementById("modeBackBtn");
+      const quizBackBtn = document.getElementById("quizBackBtn");
+      const flashBackBtn = document.getElementById("flashBackBtn");
 
-let activeSetKey = null;
-let VOWELS = [];
-let TOTAL_QUESTIONS = 0;
+      let promptEl,
+        modeTagEl,
+        feedbackEl,
+        textRow,
+        textInput,
+        hangulAnswerWrap,
+        hangulAnswerEl,
+        keyboardRow,
+        checkBtn,
+        skipBtn,
+        backspaceBtn,
+        clearBtn;
+      const scoreLabel = document.getElementById("scoreLabel");
+      const totalLabel = document.getElementById("totalLabel");
+      const dotsEl = document.getElementById("dots");
+      const cardEl = document.getElementById("card");
 
-let queue = [];
-let qIndex = 0;
-let score = 0;
-let results = [];
-let current = null;
-let answered = false;
-let typedHangul = '';
+      const flashcardEl = document.getElementById("flashcard");
+      const flashFrontEl = document.getElementById("flashFront");
+      const flashBackEl = document.getElementById("flashBack");
+      const flashIndexLabel = document.getElementById("flashIndexLabel");
+      const flashTotalLabel = document.getElementById("flashTotalLabel");
+      const flashPrevBtn = document.getElementById("flashPrevBtn");
+      const flashNextBtn = document.getElementById("flashNextBtn");
+      const flashFlipBtn = document.getElementById("flashFlipBtn");
+      const flashShuffleBtn = document.getElementById("flashShuffleBtn");
 
-let flashList = [];
-let flashIndex = 0;
-let flashFlipped = false;
+      function shuffle(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
 
-const selectScreen = document.getElementById('selectScreen');
-const modeScreen = document.getElementById('modeScreen');
-const quizScreen = document.getElementById('quizScreen');
-const flashScreen = document.getElementById('flashScreen');
-const setCardsEl = document.getElementById('setCards');
-const modeCardsEl = document.getElementById('modeCards');
-const headerSub = document.getElementById('headerSub');
-const modeBackBtn = document.getElementById('modeBackBtn');
-const quizBackBtn = document.getElementById('quizBackBtn');
-const flashBackBtn = document.getElementById('flashBackBtn');
+      function hideAllScreens() {
+        selectScreen.classList.add("hidden");
+        modeScreen.classList.add("hidden");
+        customScreen.classList.add("hidden");
+        quizScreen.classList.add("hidden");
+        flashScreen.classList.add("hidden");
+      }
 
-let promptEl, modeTagEl, feedbackEl, textRow, textInput, hangulAnswerWrap,
-    hangulAnswerEl, keyboardRow, checkBtn, skipBtn, backspaceBtn, clearBtn;
-const scoreLabel = document.getElementById('scoreLabel');
-const totalLabel = document.getElementById('totalLabel');
-const dotsEl = document.getElementById('dots');
-const cardEl = document.getElementById('card');
-
-const flashcardEl = document.getElementById('flashcard');
-const flashFrontEl = document.getElementById('flashFront');
-const flashBackEl = document.getElementById('flashBack');
-const flashIndexLabel = document.getElementById('flashIndexLabel');
-const flashTotalLabel = document.getElementById('flashTotalLabel');
-const flashPrevBtn = document.getElementById('flashPrevBtn');
-const flashNextBtn = document.getElementById('flashNextBtn');
-const flashFlipBtn = document.getElementById('flashFlipBtn');
-const flashShuffleBtn = document.getElementById('flashShuffleBtn');
-
-function shuffle(arr){
-  const a = arr.slice();
-  for(let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]] = [a[j],a[i]];
-  }
-  return a;
-}
-
-function hideAllScreens(){
-  selectScreen.classList.add('hidden');
-  modeScreen.classList.add('hidden');
-  quizScreen.classList.add('hidden');
-  flashScreen.classList.add('hidden');
-}
-
-/* ---------- Screen 1: set selection ---------- */
-function renderSetCards(){
-  setCardsEl.innerHTML = '';
-  Object.entries(VOWEL_SETS).forEach(([key, set]) => {
-    const c = document.createElement('div');
-    c.className = 'set-card';
-    c.innerHTML = `
+      /* ---------- Screen 1: set selection ---------- */
+      function renderSetCards() {
+        setCardsEl.innerHTML = "";
+        Object.entries(VOWEL_SETS).forEach(([key, set]) => {
+          if (key === "custom") return;
+          const c = document.createElement("div");
+          c.className = "set-card";
+          c.innerHTML = `
       <div class="glyphs">${set.glyphs}</div>
       <div class="info">
         <div class="tag">${set.tag}</div>
@@ -492,30 +969,139 @@ function renderSetCards(){
       </div>
       <div class="arrow">→</div>
     `;
-    c.addEventListener('click', () => chooseSet(key));
-    setCardsEl.appendChild(c);
-  });
-}
+          c.addEventListener("click", () => chooseSet(key));
+          setCardsEl.appendChild(c);
+        });
 
-function showSelectScreen(){
-  activeSetKey = null;
-  headerSub.textContent = 'Choose a set to practice';
-  hideAllScreens();
-  selectScreen.classList.remove('hidden');
-}
+        const customCard = document.createElement("div");
+        customCard.className = "set-card";
+        customCard.innerHTML = `
+    <div class="glyphs icon">🎛️</div>
+    <div class="info">
+      <div class="tag">Build your own</div>
+      <h3>Custom Mix</h3>
+      <p>Pick exactly the characters you want, from any set.</p>
+    </div>
+    <div class="arrow">→</div>
+  `;
+        customCard.addEventListener("click", showCustomScreen);
+        setCardsEl.appendChild(customCard);
+      }
 
-/* ---------- Screen 2: flashcards vs quiz ---------- */
-function renderModeCards(){
-  modeCardsEl.innerHTML = '';
-  const set = VOWEL_SETS[activeSetKey];
-  const modes = [
-    { key:'flash', icon:'🔄', title:'Flashcards', desc:'Flip through at your own pace — no typing, no scoring.' },
-    { key:'quiz',  icon:'✏️', title:'Quiz', desc:'Type the answer, get checked, both directions.' },
-  ];
-  modes.forEach(m => {
-    const c = document.createElement('div');
-    c.className = 'set-card';
-    c.innerHTML = `
+      function showSelectScreen() {
+        activeSetKey = null;
+        headerSub.textContent = "Choose a set to practice";
+        hideAllScreens();
+        selectScreen.classList.remove("hidden");
+      }
+
+      /* ---------- Custom mix builder ---------- */
+      function renderCustomScreen() {
+        customGroupsEl.innerHTML = "";
+        Object.entries(VOWEL_SETS).forEach(([key, set]) => {
+          if (key === "custom") return;
+          const group = document.createElement("div");
+          group.className = "chip-group";
+
+          const heading = document.createElement("h4");
+          heading.innerHTML = `<span>${set.label}</span>`;
+          const actions = document.createElement("span");
+          actions.className = "grp-actions";
+          const allBtn = document.createElement("button");
+          allBtn.type = "button";
+          allBtn.textContent = "all";
+          allBtn.addEventListener("click", () => {
+            set.vowels.forEach((v) => customSelected.set(v.hangul, v));
+            renderCustomScreen();
+          });
+          const noneBtn = document.createElement("button");
+          noneBtn.type = "button";
+          noneBtn.textContent = "none";
+          noneBtn.addEventListener("click", () => {
+            set.vowels.forEach((v) => customSelected.delete(v.hangul));
+            renderCustomScreen();
+          });
+          actions.appendChild(allBtn);
+          actions.appendChild(noneBtn);
+          heading.appendChild(actions);
+          group.appendChild(heading);
+
+          const row = document.createElement("div");
+          row.className = "chip-row";
+          set.vowels.forEach((v) => {
+            const chip = document.createElement("div");
+            chip.className =
+              "chip" + (customSelected.has(v.hangul) ? " selected" : "");
+            chip.innerHTML = `<span>${v.hangul}</span><span class="latin">${v.latin}</span>`;
+            chip.addEventListener("click", () => {
+              if (customSelected.has(v.hangul)) customSelected.delete(v.hangul);
+              else customSelected.set(v.hangul, v);
+              chip.classList.toggle("selected");
+              updateCustomFooter();
+            });
+            row.appendChild(chip);
+          });
+          group.appendChild(row);
+          customGroupsEl.appendChild(group);
+        });
+        updateCustomFooter();
+      }
+
+      function updateCustomFooter() {
+        const n = customSelected.size;
+        customCountEl.textContent = n;
+        customContinueBtn.disabled = n < 2;
+      }
+
+      function showCustomScreen() {
+        headerSub.textContent = "Tap the characters you want to drill";
+        hideAllScreens();
+        renderCustomScreen();
+        customScreen.classList.remove("hidden");
+      }
+
+      customBackBtn.addEventListener("click", showSelectScreen);
+      customClearBtn.addEventListener("click", () => {
+        customSelected.clear();
+        renderCustomScreen();
+      });
+      customContinueBtn.addEventListener("click", () => {
+        if (customSelected.size < 2) return;
+        const picked = Array.from(customSelected.values());
+        VOWEL_SETS.custom = {
+          label: `Custom Mix (${picked.length})`,
+          tag: "Custom",
+          desc: picked.map((v) => v.hangul).join(" "),
+          glyphs: picked.map((v) => v.hangul).join(""),
+          vowels: picked,
+        };
+        activeSetKey = "custom";
+        VOWELS = picked;
+        showModeScreen();
+      });
+
+      /* ---------- Screen 2: flashcards vs quiz ---------- */
+      function renderModeCards() {
+        modeCardsEl.innerHTML = "";
+        const set = VOWEL_SETS[activeSetKey];
+        const modes = [
+          {
+            key: "flash",
+            icon: "🔄",
+            title: "Flashcards",
+            desc: "Flip through at your own pace — no typing, no scoring.",
+          },
+          {
+            key: "quiz",
+            icon: "✏️",
+            title: "Quiz",
+            desc: "Type the answer, get checked, both directions.",
+          },
+        ];
+        modes.forEach((m) => {
+          const c = document.createElement("div");
+          c.className = "set-card";
+          c.innerHTML = `
       <div class="glyphs icon">${m.icon}</div>
       <div class="info">
         <div class="tag">${set.label}</div>
@@ -524,37 +1110,39 @@ function renderModeCards(){
       </div>
       <div class="arrow">→</div>
     `;
-    c.addEventListener('click', () => {
-      if(m.key === 'flash') startFlashcards();
-      else startQuiz();
-    });
-    modeCardsEl.appendChild(c);
-  });
-}
+          c.addEventListener("click", () => {
+            if (m.key === "flash") startFlashcards();
+            else startQuiz();
+          });
+          modeCardsEl.appendChild(c);
+        });
+      }
 
-function chooseSet(key){
-  activeSetKey = key;
-  VOWELS = VOWEL_SETS[key].vowels;
-  headerSub.textContent = VOWEL_SETS[key].label + ' — choose how to practice';
-  hideAllScreens();
-  renderModeCards();
-  modeScreen.classList.remove('hidden');
-}
+      function chooseSet(key) {
+        activeSetKey = key;
+        VOWELS = VOWEL_SETS[key].vowels;
+        headerSub.textContent =
+          VOWEL_SETS[key].label + " — choose how to practice";
+        hideAllScreens();
+        renderModeCards();
+        modeScreen.classList.remove("hidden");
+      }
 
-function showModeScreen(){
-  headerSub.textContent = VOWEL_SETS[activeSetKey].label + ' — choose how to practice';
-  hideAllScreens();
-  renderModeCards();
-  modeScreen.classList.remove('hidden');
-}
+      function showModeScreen() {
+        headerSub.textContent =
+          VOWEL_SETS[activeSetKey].label + " — choose how to practice";
+        hideAllScreens();
+        renderModeCards();
+        modeScreen.classList.remove("hidden");
+      }
 
-modeBackBtn.addEventListener('click', showSelectScreen);
-quizBackBtn.addEventListener('click', showModeScreen);
-flashBackBtn.addEventListener('click', showModeScreen);
+      modeBackBtn.addEventListener("click", showSelectScreen);
+      quizBackBtn.addEventListener("click", showModeScreen);
+      flashBackBtn.addEventListener("click", showModeScreen);
 
-/* ---------- Screen 3a: quiz ---------- */
-function buildQuizShell(){
-  cardEl.innerHTML = `
+      /* ---------- Screen 3a: quiz ---------- */
+      function buildQuizShell() {
+        cardEl.innerHTML = `
     <div class="mode-tag" id="modeTag">Read the Hangul, type romanization</div>
     <div class="prompt hangul" id="prompt">${VOWELS[0].hangul}</div>
     <div class="feedback" id="feedback"></div>
@@ -574,259 +1162,278 @@ function buildQuizShell(){
       <button class="action primary" id="checkBtn">Check</button>
     </div>
   `;
-}
+      }
 
-function bindCardRefs(){
-  promptEl = document.getElementById('prompt');
-  modeTagEl = document.getElementById('modeTag');
-  feedbackEl = document.getElementById('feedback');
-  textRow = document.getElementById('textAnswerRow');
-  textInput = document.getElementById('textAnswer');
-  hangulAnswerWrap = document.getElementById('hangulAnswerWrap');
-  hangulAnswerEl = document.getElementById('hangulAnswer');
-  keyboardRow = document.getElementById('keyboardRow');
-  checkBtn = document.getElementById('checkBtn');
-  skipBtn = document.getElementById('skipBtn');
-  backspaceBtn = document.getElementById('backspaceBtn');
-  clearBtn = document.getElementById('clearBtn');
+      function bindCardRefs() {
+        promptEl = document.getElementById("prompt");
+        modeTagEl = document.getElementById("modeTag");
+        feedbackEl = document.getElementById("feedback");
+        textRow = document.getElementById("textAnswerRow");
+        textInput = document.getElementById("textAnswer");
+        hangulAnswerWrap = document.getElementById("hangulAnswerWrap");
+        hangulAnswerEl = document.getElementById("hangulAnswer");
+        keyboardRow = document.getElementById("keyboardRow");
+        checkBtn = document.getElementById("checkBtn");
+        skipBtn = document.getElementById("skipBtn");
+        backspaceBtn = document.getElementById("backspaceBtn");
+        clearBtn = document.getElementById("clearBtn");
 
-  checkBtn.addEventListener('click', () => submitAnswer());
-  skipBtn.addEventListener('click', () => {
-    if(answered) return;
-    markAnswer(false);
-  });
-  textInput.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') submitAnswer();
-  });
-  backspaceBtn.addEventListener('click', () => {
-    if(answered) return;
-    typedHangul = typedHangul.slice(0, -1);
-    renderHangulAnswer();
-  });
-  clearBtn.addEventListener('click', () => {
-    if(answered) return;
-    typedHangul = '';
-    renderHangulAnswer();
-  });
-}
+        checkBtn.addEventListener("click", () => submitAnswer());
+        skipBtn.addEventListener("click", () => {
+          if (answered) return;
+          markAnswer(false);
+        });
+        textInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") submitAnswer();
+        });
+        backspaceBtn.addEventListener("click", () => {
+          if (answered) return;
+          typedHangul = typedHangul.slice(0, -1);
+          renderHangulAnswer();
+        });
+        clearBtn.addEventListener("click", () => {
+          if (answered) return;
+          typedHangul = "";
+          renderHangulAnswer();
+        });
+      }
 
-function startQuiz(){
-  headerSub.textContent = VOWEL_SETS[activeSetKey].label + ' — read it, type it, both ways';
-  hideAllScreens();
-  quizScreen.classList.remove('hidden');
-  startRound();
-}
+      function startQuiz() {
+        headerSub.textContent =
+          VOWEL_SETS[activeSetKey].label + " — read it, type it, both ways";
+        hideAllScreens();
+        quizScreen.classList.remove("hidden");
+        startRound();
+      }
 
-function buildQueue(){
-  TOTAL_QUESTIONS = VOWELS.length * 2;
-  let pool = [];
-  while(pool.length < TOTAL_QUESTIONS){
-    pool = pool.concat(shuffle(VOWELS));
-  }
-  pool = pool.slice(0, TOTAL_QUESTIONS);
-  queue = shuffle(pool.map(v => ({
-    vowel:v,
-    direction: Math.random() < 0.5 ? 'toLatin' : 'toHangul'
-  })));
-  results = new Array(TOTAL_QUESTIONS).fill('pending');
-  totalLabel.textContent = TOTAL_QUESTIONS;
-  renderDots();
-}
+      function buildQueue() {
+        TOTAL_QUESTIONS = VOWELS.length * 2;
+        let pool = [];
+        while (pool.length < TOTAL_QUESTIONS) {
+          pool = pool.concat(shuffle(VOWELS));
+        }
+        pool = pool.slice(0, TOTAL_QUESTIONS);
+        queue = shuffle(
+          pool.map((v) => ({
+            vowel: v,
+            direction: Math.random() < 0.5 ? "toLatin" : "toHangul",
+          })),
+        );
+        results = new Array(TOTAL_QUESTIONS).fill("pending");
+        totalLabel.textContent = TOTAL_QUESTIONS;
+        renderDots();
+      }
 
-function renderDots(){
-  dotsEl.innerHTML = '';
-  results.forEach(r => {
-    const d = document.createElement('div');
-    d.className = 'dot' + (r==='done' ? ' done' : r==='miss' ? ' miss' : '');
-    dotsEl.appendChild(d);
-  });
-}
+      function renderDots() {
+        dotsEl.innerHTML = "";
+        results.forEach((r) => {
+          const d = document.createElement("div");
+          d.className =
+            "dot" + (r === "done" ? " done" : r === "miss" ? " miss" : "");
+          dotsEl.appendChild(d);
+        });
+      }
 
-function buildKeyboard(){
-  keyboardRow.innerHTML = '';
-  shuffle(VOWELS).forEach(v => {
-    const b = document.createElement('button');
-    b.className = 'key';
-    b.type = 'button';
-    b.textContent = v.hangul;
-    b.addEventListener('click', () => {
-      if(answered) return;
-      typedHangul += v.hangul;
-      renderHangulAnswer();
-    });
-    keyboardRow.appendChild(b);
-  });
-}
+      function buildKeyboard() {
+        keyboardRow.innerHTML = "";
+        shuffle(VOWELS).forEach((v) => {
+          const b = document.createElement("button");
+          b.className = "key";
+          b.type = "button";
+          b.textContent = v.hangul;
+          b.addEventListener("click", () => {
+            if (answered) return;
+            typedHangul += v.hangul;
+            renderHangulAnswer();
+          });
+          keyboardRow.appendChild(b);
+        });
+      }
 
-function renderHangulAnswer(){
-  if(typedHangul.length === 0){
-    hangulAnswerEl.textContent = 'tap the letters below';
-    hangulAnswerEl.classList.add('placeholder');
-  } else {
-    hangulAnswerEl.textContent = typedHangul;
-    hangulAnswerEl.classList.remove('placeholder');
-  }
-}
+      function renderHangulAnswer() {
+        if (typedHangul.length === 0) {
+          hangulAnswerEl.textContent = "tap the letters below";
+          hangulAnswerEl.classList.add("placeholder");
+        } else {
+          hangulAnswerEl.textContent = typedHangul;
+          hangulAnswerEl.classList.remove("placeholder");
+        }
+      }
 
-function loadQuestion(){
-  if(qIndex >= queue.length){
-    showDoneScreen();
-    return;
-  }
-  answered = false;
-  current = queue[qIndex];
-  feedbackEl.textContent = '';
-  feedbackEl.className = 'feedback';
-  promptEl.classList.remove('shake');
+      function loadQuestion() {
+        if (qIndex >= queue.length) {
+          showDoneScreen();
+          return;
+        }
+        answered = false;
+        current = queue[qIndex];
+        feedbackEl.textContent = "";
+        feedbackEl.className = "feedback";
+        promptEl.classList.remove("shake");
 
-  if(current.direction === 'toLatin'){
-    modeTagEl.textContent = 'Read the Hangul, type romanization';
-    promptEl.className = 'prompt hangul';
-    promptEl.textContent = current.vowel.hangul;
-    textRow.classList.remove('hidden');
-    hangulAnswerWrap.classList.add('hidden');
-    textInput.value = '';
-    textInput.classList.remove('wrong-flash','correct-flash');
-    textInput.disabled = false;
-    setTimeout(() => textInput.focus(), 30);
-  } else {
-    modeTagEl.textContent = 'Read the romanization, type the Hangul';
-    promptEl.className = 'prompt latin';
-    promptEl.textContent = current.vowel.latin;
-    textRow.classList.add('hidden');
-    hangulAnswerWrap.classList.remove('hidden');
-    typedHangul = '';
-    renderHangulAnswer();
-    hangulAnswerEl.classList.remove('wrong-flash','correct-flash');
-    buildKeyboard();
-    backspaceBtn.disabled = false;
-    clearBtn.disabled = false;
-  }
-  checkBtn.textContent = 'Check';
-  checkBtn.style.display = 'block';
-}
+        if (current.direction === "toLatin") {
+          modeTagEl.textContent = "Read the Hangul, type romanization";
+          promptEl.className = "prompt hangul";
+          promptEl.textContent = current.vowel.hangul;
+          textRow.classList.remove("hidden");
+          hangulAnswerWrap.classList.add("hidden");
+          textInput.value = "";
+          textInput.classList.remove("wrong-flash", "correct-flash");
+          textInput.disabled = false;
+          setTimeout(() => textInput.focus(), 30);
+        } else {
+          modeTagEl.textContent = "Read the romanization, type the Hangul";
+          promptEl.className = "prompt latin";
+          promptEl.textContent = current.vowel.latin;
+          textRow.classList.add("hidden");
+          hangulAnswerWrap.classList.remove("hidden");
+          typedHangul = "";
+          renderHangulAnswer();
+          hangulAnswerEl.classList.remove("wrong-flash", "correct-flash");
+          buildKeyboard();
+          backspaceBtn.disabled = false;
+          clearBtn.disabled = false;
+        }
+        checkBtn.textContent = "Check";
+        checkBtn.style.display = "block";
+      }
 
-function normalize(str){
-  return str.trim().toLowerCase();
-}
+      function normalize(str) {
+        return str.trim().toLowerCase();
+      }
 
-function submitAnswer(){
-  if(answered) return;
-  let correct;
-  if(current.direction === 'toLatin'){
-    correct = normalize(textInput.value) === current.vowel.latin;
-  } else {
-    correct = typedHangul === current.vowel.hangul;
-  }
-  markAnswer(correct);
-}
+      function submitAnswer() {
+        if (answered) return;
+        let correct;
+        if (current.direction === "toLatin") {
+          correct = normalize(textInput.value) === current.vowel.latin;
+        } else {
+          correct = typedHangul === current.vowel.hangul;
+        }
+        markAnswer(correct);
+      }
 
-function markAnswer(correct){
-  answered = true;
-  if(correct){
-    score++;
-    results[qIndex] = 'done';
-    feedbackEl.textContent = '맞았어요! Correct.';
-    feedbackEl.className = 'feedback correct';
-    if(current.direction === 'toLatin') textInput.classList.add('correct-flash');
-    else hangulAnswerEl.classList.add('correct-flash');
-  } else {
-    results[qIndex] = 'miss';
-    const correctAnswer = current.direction === 'toLatin' ? current.vowel.latin : current.vowel.hangul;
-    feedbackEl.textContent = `Not quite — it's "${correctAnswer}".`;
-    feedbackEl.className = 'feedback wrong';
-    promptEl.classList.add('shake');
-    if(current.direction === 'toLatin') textInput.classList.add('wrong-flash');
-    else hangulAnswerEl.classList.add('wrong-flash');
-  }
-  scoreLabel.textContent = score;
-  renderDots();
+      function markAnswer(correct) {
+        answered = true;
+        if (correct) {
+          score++;
+          results[qIndex] = "done";
+          feedbackEl.textContent = "맞았어요! Correct.";
+          feedbackEl.className = "feedback correct";
+          if (current.direction === "toLatin")
+            textInput.classList.add("correct-flash");
+          else hangulAnswerEl.classList.add("correct-flash");
+        } else {
+          results[qIndex] = "miss";
+          const correctAnswer =
+            current.direction === "toLatin"
+              ? current.vowel.latin
+              : current.vowel.hangul;
+          feedbackEl.textContent = `Not quite — it's "${correctAnswer}".`;
+          feedbackEl.className = "feedback wrong";
+          promptEl.classList.add("shake");
+          if (current.direction === "toLatin")
+            textInput.classList.add("wrong-flash");
+          else hangulAnswerEl.classList.add("wrong-flash");
+        }
+        scoreLabel.textContent = score;
+        renderDots();
 
-  if(current.direction === 'toHangul'){
-    Array.from(keyboardRow.children).forEach(btn => btn.disabled = true);
-    backspaceBtn.disabled = true;
-    clearBtn.disabled = true;
-  } else {
-    textInput.disabled = true;
-  }
+        if (current.direction === "toHangul") {
+          Array.from(keyboardRow.children).forEach(
+            (btn) => (btn.disabled = true),
+          );
+          backspaceBtn.disabled = true;
+          clearBtn.disabled = true;
+        } else {
+          textInput.disabled = true;
+        }
 
-  setTimeout(() => {
-    qIndex++;
-    loadQuestion();
-  }, correct ? 700 : 1150);
-}
+        setTimeout(
+          () => {
+            qIndex++;
+            loadQuestion();
+          },
+          correct ? 700 : 1150,
+        );
+      }
 
-function showDoneScreen(){
-  const pct = Math.round((score / TOTAL_QUESTIONS) * 100);
-  cardEl.innerHTML = `
+      function showDoneScreen() {
+        const pct = Math.round((score / TOTAL_QUESTIONS) * 100);
+        cardEl.innerHTML = `
     <div class="done-screen">
       <div class="mode-tag">Round complete</div>
       <div class="big">${score} / ${TOTAL_QUESTIONS}</div>
-      <p>${pct}% correct — ${pct >= 85 ? '잘했어요! nicely done.' : pct >= 60 ? 'solid, keep drilling the misses.' : 'run it back, the vowels will stick.'}</p>
+      <p>${pct}% correct — ${pct >= 85 ? "잘했어요! nicely done." : pct >= 60 ? "solid, keep drilling the misses." : "run it back, the vowels will stick."}</p>
       <div class="controls" style="margin-top:22px;">
         <button class="action ghost" id="chooseSetBtn">Choose set</button>
         <button class="action primary" id="restartBtn">Shuffle & retry</button>
       </div>
     </div>
   `;
-  document.getElementById('restartBtn').addEventListener('click', startRound);
-  document.getElementById('chooseSetBtn').addEventListener('click', showSelectScreen);
-}
+        document
+          .getElementById("restartBtn")
+          .addEventListener("click", startRound);
+        document
+          .getElementById("chooseSetBtn")
+          .addEventListener("click", showSelectScreen);
+      }
 
-function startRound(){
-  score = 0;
-  qIndex = 0;
-  buildQuizShell();
-  bindCardRefs();
-  scoreLabel.textContent = 0;
-  buildQueue();
-  loadQuestion();
-}
+      function startRound() {
+        score = 0;
+        qIndex = 0;
+        buildQuizShell();
+        bindCardRefs();
+        scoreLabel.textContent = 0;
+        buildQueue();
+        loadQuestion();
+      }
 
-/* ---------- Screen 3b: flashcards ---------- */
-function startFlashcards(){
-  headerSub.textContent = VOWEL_SETS[activeSetKey].label + ' — flashcards';
-  hideAllScreens();
-  flashScreen.classList.remove('hidden');
-  flashList = shuffle(VOWELS);
-  flashIndex = 0;
-  flashFlipped = false;
-  renderFlashcard();
-}
+      /* ---------- Screen 3b: flashcards ---------- */
+      function startFlashcards() {
+        headerSub.textContent =
+          VOWEL_SETS[activeSetKey].label + " — flashcards";
+        hideAllScreens();
+        flashScreen.classList.remove("hidden");
+        flashList = shuffle(VOWELS);
+        flashIndex = 0;
+        flashFlipped = false;
+        renderFlashcard();
+      }
 
-function renderFlashcard(){
-  const v = flashList[flashIndex];
-  flashcardEl.classList.remove('flipped');
-  flashFlipped = false;
-  flashFrontEl.innerHTML = `<div class="glyph">${v.hangul}</div><div class="label">tap to flip</div>`;
-  flashBackEl.innerHTML = `<div class="glyph">${v.latin}</div><div class="label">romanization</div>`;
-  flashIndexLabel.textContent = flashIndex + 1;
-  flashTotalLabel.textContent = flashList.length;
-}
+      function renderFlashcard() {
+        const v = flashList[flashIndex];
+        flashcardEl.classList.remove("flipped");
+        flashFlipped = false;
+        flashFrontEl.innerHTML = `<div class="glyph">${v.hangul}</div><div class="label">tap to flip</div>`;
+        flashBackEl.innerHTML = `<div class="glyph">${v.latin}</div><div class="label">romanization</div>`;
+        flashIndexLabel.textContent = flashIndex + 1;
+        flashTotalLabel.textContent = flashList.length;
+      }
 
-function flipFlashcard(){
-  flashFlipped = !flashFlipped;
-  flashcardEl.classList.toggle('flipped', flashFlipped);
-}
+      function flipFlashcard() {
+        flashFlipped = !flashFlipped;
+        flashcardEl.classList.toggle("flipped", flashFlipped);
+      }
 
-function goFlash(delta){
-  flashIndex = (flashIndex + delta + flashList.length) % flashList.length;
-  renderFlashcard();
-}
+      function goFlash(delta) {
+        flashIndex = (flashIndex + delta + flashList.length) % flashList.length;
+        renderFlashcard();
+      }
 
-flashcardEl.addEventListener('click', flipFlashcard);
-flashFlipBtn.addEventListener('click', flipFlashcard);
-flashPrevBtn.addEventListener('click', () => goFlash(-1));
-flashNextBtn.addEventListener('click', () => goFlash(1));
-flashShuffleBtn.addEventListener('click', () => {
-  flashList = shuffle(VOWELS);
-  flashIndex = 0;
-  renderFlashcard();
-});
+      flashcardEl.addEventListener("click", flipFlashcard);
+      flashFlipBtn.addEventListener("click", flipFlashcard);
+      flashPrevBtn.addEventListener("click", () => goFlash(-1));
+      flashNextBtn.addEventListener("click", () => goFlash(1));
+      flashShuffleBtn.addEventListener("click", () => {
+        flashList = shuffle(VOWELS);
+        flashIndex = 0;
+        renderFlashcard();
+      });
 
-/* ---------- init ---------- */
-renderSetCards();
-showSelectScreen();
-</script>
-</body>
+      /* ---------- init ---------- */
+      renderSetCards();
+      showSelectScreen();
+    </script>
+  </body>
 </html>
