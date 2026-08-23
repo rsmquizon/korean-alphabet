@@ -606,6 +606,104 @@
         display: none !important;
       }
 
+      /* ---- Timed writing / dictation ---- */
+      .seconds-row {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .seconds-chip {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 20px;
+        cursor: pointer;
+        background: rgba(238, 231, 216, 0.05);
+        color: var(--paper);
+        transition:
+          border-color 0.12s,
+          background 0.12s;
+      }
+      .seconds-chip.selected {
+        border-color: var(--jade);
+        background: rgba(79, 169, 140, 0.18);
+        color: var(--jade);
+      }
+
+      .timer-wrap {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 18px;
+      }
+      .timer-ring {
+        width: 104px;
+        height: 104px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: conic-gradient(
+          var(--jade) 100%,
+          rgba(238, 231, 216, 0.1) 0
+        );
+      }
+      .timer-inner {
+        width: 82px;
+        height: 82px;
+        border-radius: 50%;
+        background: linear-gradient(180deg, var(--ink-2), var(--ink));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 28px;
+        color: var(--paper);
+      }
+
+      .answer-key {
+        margin-top: 16px;
+        max-height: 360px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .answer-key-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(238, 231, 216, 0.04);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 9px 14px;
+      }
+      .answer-key-row .idx {
+        color: var(--paper-dim);
+        font-size: 11.5px;
+        width: 22px;
+        flex-shrink: 0;
+      }
+      .answer-key-row .hg {
+        font-family: "Noto Serif KR", serif;
+        font-weight: 700;
+        font-size: 21px;
+        flex: 1;
+        text-align: center;
+      }
+      .answer-key-row .lt {
+        font-family: "Space Grotesk", sans-serif;
+        color: var(--gold);
+        font-weight: 600;
+        font-size: 13px;
+        width: 64px;
+        text-align: right;
+        flex-shrink: 0;
+      }
+
       /* ---- Custom mix picker ---- */
       .chip-group {
         margin-bottom: 20px;
@@ -774,6 +872,100 @@
           <button type="button" id="customContinueBtn" disabled>
             Continue →
           </button>
+        </div>
+      </div>
+
+      <!-- Screen 3c: timed writing / dictation -->
+      <div id="timedScreen" class="hidden">
+        <button class="back-link" id="timedBackBtn">← back</button>
+
+        <div id="timedSetup">
+          <div class="card" style="text-align: center">
+            <div class="mode-tag">Timed Writing · Dictation</div>
+            <p
+              style="
+                color: var(--paper-dim);
+                font-size: 13px;
+                margin: 0 0 22px;
+                line-height: 1.5;
+              "
+            >
+              Each item flashes on screen (and gets read aloud) for a fixed time
+              — write your answer on paper. When the round ends, we show the
+              answer key so you can grade yourself.
+            </p>
+            <div
+              style="
+                font-size: 11px;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: var(--paper-dim);
+                margin-bottom: 12px;
+              "
+            >
+              Seconds per item
+            </div>
+            <div class="seconds-row" id="secondsRow"></div>
+            <button
+              class="action primary"
+              id="timedStartBtn"
+              style="margin-top: 26px; width: 100%"
+            >
+              Start Round
+            </button>
+          </div>
+        </div>
+
+        <div id="timedRound" class="hidden">
+          <div class="stats">
+            <div>
+              Item <b id="timedIndexLabel">1</b> /
+              <span id="timedTotalLabel">16</span>
+            </div>
+            <button
+              class="back-link"
+              id="timedPauseBtn"
+              style="margin-bottom: 0"
+            >
+              ⏸ Pause
+            </button>
+          </div>
+          <div class="card" style="text-align: center">
+            <div class="mode-tag" id="timedModeTag">
+              Look, then write the romanization
+            </div>
+            <div class="timer-wrap">
+              <div class="timer-ring" id="timerRing">
+                <div class="timer-inner"><span id="timerSeconds">10</span></div>
+              </div>
+            </div>
+            <div class="prompt hangul" id="timedPrompt">ㅏ</div>
+            <div class="controls">
+              <button class="action ghost" id="timedSoundBtn">
+                🔊 Hear it
+              </button>
+              <button class="action primary" id="timedNextBtn">Next →</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="timedDone" class="hidden">
+          <div class="card">
+            <div class="done-screen">
+              <div class="mode-tag">Round complete</div>
+              <div class="big">✓</div>
+              <p>Grade your paper against the key below.</p>
+            </div>
+            <div id="answerKeyList" class="answer-key"></div>
+            <div class="controls" style="margin-top: 12px">
+              <button class="action ghost" id="timedChooseSetBtn">
+                Choose set
+              </button>
+              <button class="action primary" id="timedRetryBtn">
+                Shuffle & retry
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -980,11 +1172,19 @@
       let flashIndex = 0;
       let flashFlipped = false;
 
+      let timedSecondsPerItem = 10;
+      let timedQueue = [];
+      let timedIndex = 0;
+      let timedRemaining = 0;
+      let timedIntervalId = null;
+      let timedPaused = false;
+
       const selectScreen = document.getElementById("selectScreen");
       const modeScreen = document.getElementById("modeScreen");
       const customScreen = document.getElementById("customScreen");
       const quizScreen = document.getElementById("quizScreen");
       const flashScreen = document.getElementById("flashScreen");
+      const timedScreen = document.getElementById("timedScreen");
       const setCardsEl = document.getElementById("setCards");
       const modeCardsEl = document.getElementById("modeCards");
       const customGroupsEl = document.getElementById("customGroups");
@@ -1026,6 +1226,25 @@
       const flashNextBtn = document.getElementById("flashNextBtn");
       const flashFlipBtn = document.getElementById("flashFlipBtn");
       const flashShuffleBtn = document.getElementById("flashShuffleBtn");
+
+      const timedBackBtn = document.getElementById("timedBackBtn");
+      const timedSetup = document.getElementById("timedSetup");
+      const timedRound = document.getElementById("timedRound");
+      const timedDone = document.getElementById("timedDone");
+      const secondsRowEl = document.getElementById("secondsRow");
+      const timedStartBtn = document.getElementById("timedStartBtn");
+      const timedIndexLabel = document.getElementById("timedIndexLabel");
+      const timedTotalLabel = document.getElementById("timedTotalLabel");
+      const timedPauseBtn = document.getElementById("timedPauseBtn");
+      const timedModeTag = document.getElementById("timedModeTag");
+      const timerRing = document.getElementById("timerRing");
+      const timerSecondsEl = document.getElementById("timerSeconds");
+      const timedPrompt = document.getElementById("timedPrompt");
+      const timedSoundBtn = document.getElementById("timedSoundBtn");
+      const timedNextBtn = document.getElementById("timedNextBtn");
+      const answerKeyListEl = document.getElementById("answerKeyList");
+      const timedChooseSetBtn = document.getElementById("timedChooseSetBtn");
+      const timedRetryBtn = document.getElementById("timedRetryBtn");
 
       /* ---------- Audio: pronunciation + feedback chimes ---------- */
       const soundToggleBtn = document.getElementById("soundToggleBtn");
@@ -1126,6 +1345,8 @@
         customScreen.classList.add("hidden");
         quizScreen.classList.add("hidden");
         flashScreen.classList.add("hidden");
+        timedScreen.classList.add("hidden");
+        if (timedIntervalId) clearInterval(timedIntervalId);
       }
 
       /* ---------- Screen 1: set selection ---------- */
@@ -1272,6 +1493,12 @@
             title: "Quiz",
             desc: "Type the answer, get checked, both directions.",
           },
+          {
+            key: "timed",
+            icon: "⏱️",
+            title: "Timed Writing",
+            desc: "A countdown per item — write your answers on paper, check against the key after.",
+          },
         ];
         modes.forEach((m) => {
           const c = document.createElement("div");
@@ -1287,6 +1514,7 @@
     `;
           c.addEventListener("click", () => {
             if (m.key === "flash") startFlashcards();
+            else if (m.key === "timed") startTimedWriting();
             else startQuiz();
           });
           modeCardsEl.appendChild(c);
@@ -1622,6 +1850,130 @@
         flashIndex = 0;
         renderFlashcard();
       });
+
+      /* ---------- Screen 3c: timed writing / dictation ---------- */
+      function renderSecondsChips() {
+        secondsRowEl.innerHTML = "";
+        [5, 10, 15, 20].forEach((s) => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className =
+            "seconds-chip" + (s === timedSecondsPerItem ? " selected" : "");
+          chip.textContent = s + "s";
+          chip.addEventListener("click", () => {
+            timedSecondsPerItem = s;
+            renderSecondsChips();
+          });
+          secondsRowEl.appendChild(chip);
+        });
+      }
+
+      function startTimedWriting() {
+        headerSub.textContent =
+          VOWEL_SETS[activeSetKey].label + " — timed writing";
+        hideAllScreens();
+        timedScreen.classList.remove("hidden");
+        timedSetup.classList.remove("hidden");
+        timedRound.classList.add("hidden");
+        timedDone.classList.add("hidden");
+        renderSecondsChips();
+      }
+
+      function beginTimedRound() {
+        timedQueue = shuffle(VOWELS).map((v) => ({
+          vowel: v,
+          direction: Math.random() < 0.5 ? "toLatin" : "toHangul",
+        }));
+        timedIndex = 0;
+        timedSetup.classList.add("hidden");
+        timedDone.classList.add("hidden");
+        timedRound.classList.remove("hidden");
+        timedTotalLabel.textContent = timedQueue.length;
+        loadTimedItem();
+      }
+
+      function loadTimedItem() {
+        clearInterval(timedIntervalId);
+        if (timedIndex >= timedQueue.length) {
+          finishTimedRound();
+          return;
+        }
+        const item = timedQueue[timedIndex];
+        timedIndexLabel.textContent = timedIndex + 1;
+        timedPrompt.classList.remove("shake");
+        if (item.direction === "toLatin") {
+          timedModeTag.textContent = "Look, then write the romanization";
+          timedPrompt.className = "prompt hangul";
+          timedPrompt.textContent = item.vowel.hangul;
+        } else {
+          timedModeTag.textContent = "Look / listen, then write the Hangul";
+          timedPrompt.className = "prompt latin";
+          timedPrompt.textContent = item.vowel.latin;
+        }
+        setTimeout(() => autoSpeak(item.vowel.hangul), 150);
+        timedRemaining = timedSecondsPerItem;
+        updateTimerUI();
+        timedPaused = false;
+        timedPauseBtn.textContent = "⏸ Pause";
+        timedIntervalId = setInterval(tickTimer, 1000);
+      }
+
+      function tickTimer() {
+        timedRemaining -= 1;
+        updateTimerUI();
+        if (timedRemaining <= 0) {
+          clearInterval(timedIntervalId);
+          timedIndex++;
+          loadTimedItem();
+        }
+      }
+
+      function updateTimerUI() {
+        timerSecondsEl.textContent = Math.max(timedRemaining, 0);
+        const pct = Math.max(0, (timedRemaining / timedSecondsPerItem) * 100);
+        const color = timedRemaining <= 3 ? "var(--coral)" : "var(--jade)";
+        timerRing.style.background = `conic-gradient(${color} ${pct}%, rgba(238,231,216,0.1) 0)`;
+      }
+
+      function finishTimedRound() {
+        timedRound.classList.add("hidden");
+        timedDone.classList.remove("hidden");
+        answerKeyListEl.innerHTML = timedQueue
+          .map(
+            (item, i) => `
+    <div class="answer-key-row">
+      <span class="idx">${i + 1}</span>
+      <span class="hg">${item.vowel.hangul}</span>
+      <span class="lt">${item.vowel.latin}</span>
+    </div>
+  `,
+          )
+          .join("");
+      }
+
+      timedStartBtn.addEventListener("click", beginTimedRound);
+      timedNextBtn.addEventListener("click", () => {
+        clearInterval(timedIntervalId);
+        timedIndex++;
+        loadTimedItem();
+      });
+      timedSoundBtn.addEventListener("click", () => {
+        const item = timedQueue[timedIndex];
+        if (item) speak(item.vowel.hangul);
+      });
+      timedPauseBtn.addEventListener("click", () => {
+        timedPaused = !timedPaused;
+        if (timedPaused) {
+          clearInterval(timedIntervalId);
+          timedPauseBtn.textContent = "▶ Resume";
+        } else {
+          timedIntervalId = setInterval(tickTimer, 1000);
+          timedPauseBtn.textContent = "⏸ Pause";
+        }
+      });
+      timedRetryBtn.addEventListener("click", beginTimedRound);
+      timedChooseSetBtn.addEventListener("click", showSelectScreen);
+      timedBackBtn.addEventListener("click", showModeScreen);
 
       /* ---------- init ---------- */
       renderSetCards();
