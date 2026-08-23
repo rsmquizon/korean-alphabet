@@ -81,6 +81,30 @@
         font-size: 13.5px;
         margin-top: 6px;
       }
+      .sound-toggle {
+        margin-top: 14px;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        color: var(--paper-dim);
+        background: transparent;
+        border: 1.5px solid var(--line);
+        border-radius: 999px;
+        padding: 6px 14px;
+        cursor: pointer;
+        transition:
+          border-color 0.12s,
+          color 0.12s;
+      }
+      .sound-toggle:hover {
+        border-color: var(--jade-dim);
+        color: var(--paper);
+      }
+      .sound-toggle.on {
+        color: var(--jade);
+        border-color: rgba(79, 169, 140, 0.4);
+      }
 
       /* ---- Card-choice screens (set select + mode select) ---- */
       .set-cards {
@@ -291,6 +315,35 @@
         }
       }
 
+      .prompt-audio-row {
+        margin-top: 14px;
+      }
+      .sound-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(238, 231, 216, 0.05);
+        border: 1.5px solid var(--line);
+        border-radius: 999px;
+        color: var(--paper);
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 12.5px;
+        font-weight: 600;
+        padding: 8px 16px;
+        cursor: pointer;
+        transition:
+          border-color 0.12s,
+          background 0.12s,
+          transform 0.08s;
+      }
+      .sound-btn:hover {
+        border-color: var(--jade-dim);
+        background: rgba(79, 169, 140, 0.14);
+      }
+      .sound-btn:active {
+        transform: scale(0.95);
+      }
+
       .feedback {
         min-height: 22px;
         font-size: 14px;
@@ -469,8 +522,37 @@
 
       /* ---- Flashcards ---- */
       .flash-wrap {
+        position: relative;
         perspective: 1400px;
         margin-bottom: 22px;
+      }
+      .flash-sound-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 5;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: rgba(28, 35, 51, 0.55);
+        border: 1.5px solid var(--line);
+        color: var(--paper);
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          border-color 0.12s,
+          background 0.12s,
+          transform 0.08s;
+      }
+      .flash-sound-btn:hover {
+        border-color: var(--jade-dim);
+        background: rgba(79, 169, 140, 0.22);
+      }
+      .flash-sound-btn:active {
+        transform: scale(0.92);
       }
       .flashcard {
         position: relative;
@@ -656,6 +738,9 @@
         <div class="eyebrow">모음 연습 · vowel drill</div>
         <h1>Hangul <span>Vowel</span> Quiz</h1>
         <div class="sub" id="headerSub">Choose a set to practice</div>
+        <button class="sound-toggle" id="soundToggleBtn" type="button">
+          🔊 Sound on
+        </button>
       </header>
 
       <!-- Screen 1: pick vowel set -->
@@ -758,6 +843,9 @@
         </div>
 
         <div class="flash-wrap">
+          <button class="flash-sound-btn" id="flashSoundBtn" type="button">
+            🔊
+          </button>
           <div class="flashcard" id="flashcard">
             <div class="flash-face flash-front" id="flashFront"></div>
             <div class="flash-face flash-back" id="flashBack"></div>
@@ -920,13 +1008,16 @@
         checkBtn,
         skipBtn,
         backspaceBtn,
-        clearBtn;
+        clearBtn,
+        promptSoundBtn;
+      let soundEnabled = true;
       const scoreLabel = document.getElementById("scoreLabel");
       const totalLabel = document.getElementById("totalLabel");
       const dotsEl = document.getElementById("dots");
       const cardEl = document.getElementById("card");
 
       const flashcardEl = document.getElementById("flashcard");
+      const flashSoundBtn = document.getElementById("flashSoundBtn");
       const flashFrontEl = document.getElementById("flashFront");
       const flashBackEl = document.getElementById("flashBack");
       const flashIndexLabel = document.getElementById("flashIndexLabel");
@@ -935,6 +1026,90 @@
       const flashNextBtn = document.getElementById("flashNextBtn");
       const flashFlipBtn = document.getElementById("flashFlipBtn");
       const flashShuffleBtn = document.getElementById("flashShuffleBtn");
+
+      /* ---------- Audio: pronunciation + feedback chimes ---------- */
+      const soundToggleBtn = document.getElementById("soundToggleBtn");
+      let koreanVoice = null;
+
+      function pickKoreanVoice() {
+        if (!("speechSynthesis" in window)) return;
+        const voices = window.speechSynthesis.getVoices();
+        koreanVoice =
+          voices.find((v) => v.lang && v.lang.toLowerCase().startsWith("ko")) ||
+          null;
+      }
+      if ("speechSynthesis" in window) {
+        pickKoreanVoice();
+        window.speechSynthesis.onvoiceschanged = pickKoreanVoice;
+      }
+
+      function speak(text) {
+        if (!("speechSynthesis" in window) || !text) return;
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = "ko-KR";
+        utter.rate = 0.8;
+        if (koreanVoice) utter.voice = koreanVoice;
+        window.speechSynthesis.speak(utter);
+      }
+
+      function autoSpeak(text) {
+        if (soundEnabled) speak(text);
+      }
+
+      function playChime(correct) {
+        if (!soundEnabled) return;
+        try {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          const ctx = new Ctx();
+          const now = ctx.currentTime;
+          if (correct) {
+            [523.25, 659.25, 783.99].forEach((f, i) => {
+              const o = ctx.createOscillator(),
+                g = ctx.createGain();
+              o.type = "sine";
+              o.frequency.value = f;
+              o.connect(g);
+              g.connect(ctx.destination);
+              const t = now + i * 0.09;
+              g.gain.setValueAtTime(0.0001, t);
+              g.gain.exponentialRampToValueAtTime(0.16, t + 0.01);
+              g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+              o.start(t);
+              o.stop(t + 0.22);
+            });
+          } else {
+            const o = ctx.createOscillator(),
+              g = ctx.createGain();
+            o.type = "sawtooth";
+            o.frequency.setValueAtTime(220, now);
+            o.frequency.exponentialRampToValueAtTime(130, now + 0.28);
+            o.connect(g);
+            g.connect(ctx.destination);
+            g.gain.setValueAtTime(0.0001, now);
+            g.gain.exponentialRampToValueAtTime(0.13, now + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+            o.start(now);
+            o.stop(now + 0.34);
+          }
+        } catch (e) {
+          /* audio not available, ignore */
+        }
+      }
+
+      function updateSoundToggleUI() {
+        soundToggleBtn.textContent = soundEnabled
+          ? "🔊 Sound on"
+          : "🔇 Sound off";
+        soundToggleBtn.classList.toggle("on", soundEnabled);
+      }
+      soundToggleBtn.addEventListener("click", () => {
+        soundEnabled = !soundEnabled;
+        if (!soundEnabled && "speechSynthesis" in window)
+          window.speechSynthesis.cancel();
+        updateSoundToggleUI();
+      });
+      updateSoundToggleUI();
 
       function shuffle(arr) {
         const a = arr.slice();
@@ -1145,6 +1320,9 @@
         cardEl.innerHTML = `
     <div class="mode-tag" id="modeTag">Read the Hangul, type romanization</div>
     <div class="prompt hangul" id="prompt">${VOWELS[0].hangul}</div>
+    <div class="prompt-audio-row">
+      <button class="sound-btn" id="promptSoundBtn" type="button">🔊 Hear it</button>
+    </div>
     <div class="feedback" id="feedback"></div>
     <div class="answer-row" id="textAnswerRow">
       <input class="text-answer" id="textAnswer" placeholder="type romanization…" autocomplete="off" autocapitalize="off" spellcheck="false">
@@ -1177,7 +1355,11 @@
         skipBtn = document.getElementById("skipBtn");
         backspaceBtn = document.getElementById("backspaceBtn");
         clearBtn = document.getElementById("clearBtn");
+        promptSoundBtn = document.getElementById("promptSoundBtn");
 
+        promptSoundBtn.addEventListener("click", () =>
+          speak(current.vowel.hangul),
+        );
         checkBtn.addEventListener("click", () => submitAnswer());
         skipBtn.addEventListener("click", () => {
           if (answered) return;
@@ -1281,6 +1463,7 @@
           textInput.classList.remove("wrong-flash", "correct-flash");
           textInput.disabled = false;
           setTimeout(() => textInput.focus(), 30);
+          setTimeout(() => autoSpeak(current.vowel.hangul), 150);
         } else {
           modeTagEl.textContent = "Read the romanization, type the Hangul";
           promptEl.className = "prompt latin";
@@ -1315,6 +1498,7 @@
 
       function markAnswer(correct) {
         answered = true;
+        playChime(correct);
         if (correct) {
           score++;
           results[qIndex] = "done";
@@ -1336,6 +1520,8 @@
             textInput.classList.add("wrong-flash");
           else hangulAnswerEl.classList.add("wrong-flash");
         }
+        if (current.direction === "toHangul")
+          setTimeout(() => autoSpeak(current.vowel.hangul), 200);
         scoreLabel.textContent = score;
         renderDots();
 
@@ -1409,11 +1595,13 @@
         flashBackEl.innerHTML = `<div class="glyph">${v.latin}</div><div class="label">romanization</div>`;
         flashIndexLabel.textContent = flashIndex + 1;
         flashTotalLabel.textContent = flashList.length;
+        autoSpeak(v.hangul);
       }
 
       function flipFlashcard() {
         flashFlipped = !flashFlipped;
         flashcardEl.classList.toggle("flipped", flashFlipped);
+        if (!flashFlipped) autoSpeak(flashList[flashIndex].hangul);
       }
 
       function goFlash(delta) {
@@ -1425,6 +1613,10 @@
       flashFlipBtn.addEventListener("click", flipFlashcard);
       flashPrevBtn.addEventListener("click", () => goFlash(-1));
       flashNextBtn.addEventListener("click", () => goFlash(1));
+      flashSoundBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        speak(flashList[flashIndex].hangul);
+      });
       flashShuffleBtn.addEventListener("click", () => {
         flashList = shuffle(VOWELS);
         flashIndex = 0;
